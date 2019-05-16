@@ -113,7 +113,7 @@ void PluginDajeAudioProcessorEditor::setNoteNumber(int noteNumber)
     
     float timeNow = Time::getMillisecondCounterHiRes() * 0.001;
     
-    if(timeNow - firstTime - startTime >0.3)
+    if(timeNow - prevTime - startTime >0.3)
     {
         BPMDetection(timeNow);
         
@@ -132,33 +132,14 @@ void PluginDajeAudioProcessorEditor::setNoteNumber(int noteNumber)
 void PluginDajeAudioProcessorEditor::BPMDetection(float timeNow)
 {
     numBeat++;
-    timeAverage = (timeAverage * (numBeat - 1) + (timeNow - firstTime - startTime)) / numBeat;
-    firstTime = timeNow - startTime;
+    if(numBeat > 1)
+        timeAverage = (timeAverage * (numBeat - 1) + (timeNow - prevTime - startTime)) / numBeat;
     
-    //fillBPMQueue(firstTime);
-    BPM = 60 / timeAverage;
+    prevTime = timeNow - startTime;
+    
+    if(numBeat > 1)
+        BPM = 60 / timeAverage;
 }
-
-//void PluginDajeAudioProcessorEditor::fillBPMQueue(float firstTime)
-//{
-//
-//    bpmQueue.push(firstTime);
-//    if(numBeat%7==0)
-//    {
-//        medianFilterFunction();
-//    }
-//
-//}
-
-//void PluginDajeAudioProcessorEditor::medianFilterFunction()
-//{
-//    for(int i=0;i<3;i++)
-//    {
-//        bpmQueue.pop();
-//    }
-//
-//    bpmQueue.front()
-//}
 
 void PluginDajeAudioProcessorEditor::logMessage(const String& m)
 {
@@ -204,26 +185,27 @@ void PluginDajeAudioProcessorEditor::drawNextLineOfSpectrogram()
 	auto imageHeight = spectrogramImage.getHeight();
 	spectrogramImage.moveImageSection(0, 0, 1, 0, rightHandEdge, imageHeight);                       // [1]
     
-    findRangeValueFunction(processor.getFFTData());
+    
     
     //for(int i=0; i<processor.fftSize; i++){
     //    printf("%.2f ", processor.getFFTData()[i]);
     //}
     //printf("\n");
     
-    
 	forwardFFT.performFrequencyOnlyForwardTransform(processor.getFFTData());                         // [2]
     //printf("\nwe");
     
+    findRangeValueFunction(processor.getFFTData());
     
     //findRangeValueFunction(processor.getFFTData());     //da qui parte il processo di normalizzazione, per ora commentato perchè ho                                   visto che funziona meglio senza (la normalizzazione funziona)
-    for(int i=0; i<processor.fftSize; i++){
-        printf("%.2f ", processor.getFFTData()[i]);
-    }
-    printf("\n");
-    
-	beatDetection();
-    
+    //for(int i=0; i<processor.fftSize; i++){
+    //    printf("%.2f ", processor.getFFTData()[i]);
+    //}
+    //printf("\n");
+    //if(fftReady)
+    //{
+        beatDetection();
+    //}
 	auto maxLevel = FloatVectorOperations::findMinAndMax(processor.getFFTData(), processor.fftSize / 2);                      // [3]
 	for (auto y = 1; y < imageHeight; ++y)                                                           // [4]
 	{
@@ -247,29 +229,27 @@ void PluginDajeAudioProcessorEditor::timerCallback()
 void PluginDajeAudioProcessorEditor::findRangeValueFunction(float* data)
 {
     //float* data = processor.getFFTData();
-    float min=data[0];
-    float max=data[0];
     
     for(int i=1; i<processor.fftSize; i++){
-        if(data[i]>max)
-            max = data[i];
-        if(data[i]<min)
-            min = data[i];
+        if(data[i]>maxAbs)
+            maxAbs = data[i];
+        if(data[i]<minAbs)
+            minAbs = data[i];
     }
     
     
     
-    scaleFunction(min, max, data);
-    //scaleFunction(min, max, data);
+    scaleFunction(data);
+   
 }
 
-void PluginDajeAudioProcessorEditor::scaleFunction(float min,float max,float* data)
+void PluginDajeAudioProcessorEditor::scaleFunction(float* data)
 {
     
     for(int i=0; i<processor.fftSize; i++){
        
         //processor.getFFTData()[i] =  ((data[i]-min) * (1-(-1))) / ((max-min)+(-1))  ;
-        processor.getFFTData()[i] = 2 *((data[i] - min)/(max - min)) -1;
+        processor.getFFTData()[i] = 1 *((data[i] - minAbs)/(maxAbs - minAbs)) -0;
     }
     
     
@@ -283,20 +263,31 @@ void PluginDajeAudioProcessorEditor::scaleFunction(float min,float max,float* da
 //Se è maggiore, è un beat
 void PluginDajeAudioProcessorEditor::beatDetection() {
 
-    float energyLowMid = performEnergyLowMidFFT();          //calcolo energia del range low-mid del singolo buffer
+    float energyRange[2];
+    
+    energyRange[0] = performEnergyFFT(0);
+    energyRange[1] = performEnergyFFT(1);          //calcolo energia del range low-mid del singolo buffer
     
     
     //fillEnergyHistory(energyLowMid);
     //printf("Energy: %.3f", energyLowMid);
-    energyHistory.push(energyLowMid);
+    
+    std::vector<float> fftResult;
+    fftResult.reserve(2);
+    for(int i = 0; i < 2; i++)
+    {
+        fftResult.push_back(energyRange[i]);
+    }
+    
+    energyHistory.push(fftResult);
     
     
-
+    //printf("energyIndex: %d\n", energyIndex%43);
     
     //if(energyHistory.size()>0)
     //{
     //    printf("testa della coda %d\n", energyHistory.size());
-    //    printf("FRONT %.3f       ENERGY: %.3f\n", energyHistory.front(), energyLowMid);
+    //printf("FRONT %.3f       ENERGY: %.3f\n", energyHistory.front(), energyLowMid);
     //}
     
     
@@ -309,20 +300,19 @@ void PluginDajeAudioProcessorEditor::beatDetection() {
     
     
     
-    if (energyIndex > dim-1) {
-        BPMthreshold = thresholdCalculus();
+    if (energyIndex >= dim-1) {
+        thresholdCalculus();  //calcolus BPMThreshold
         
         
         //for(int i=0; i<dim; i++){
         //    energyHistoryOld[i] = energyHistory[i];
         //}
         
-        //printf("Thresh: %.4f   +   energy: %.4f   \n", BPMthreshold, energyLowMid);
+        //printf("Thresh: %.4f   +   energy: %.4f    +dim: %d   \n", BPMthreshold[0], energyRange[0], energyHistory.size());
         
         
-        if (energyLowMid > BPMthreshold) {        //confronto con 1 secondo di delay
+        if (energyRange[0] - 0.05 > BPMthreshold[0] /*|| energyRange[1] - 0.005 > BPMthreshold[1]*/) {        //confronto con 1 secondo di delay
             setNoteNumber(80);
-            
             //printf("\n");
             //printf("BEAT\n");
             //for(int i=7; i<=17; i++){
@@ -341,17 +331,29 @@ void PluginDajeAudioProcessorEditor::beatDetection() {
 }
 
 //fa la media dell energy history buffer
-float PluginDajeAudioProcessorEditor::fullGas(std::queue<float> temporalQueue)
+float PluginDajeAudioProcessorEditor::averageQueue(std::queue<std::vector<float>> temporalQueue, int index)
 {
-    float val, sum=0;
+    std::vector<float> val;
+    float sum = 0;
     
-    while(temporalQueue.size()>0)
+    if(index == 0)
     {
-        
-        val=temporalQueue.front();
-        sum = sum+val;
+        while(temporalQueue.size() > 0)
+        {
+        val = temporalQueue.front();
+        sum = sum + val[0];
         temporalQueue.pop();
-        
+        }
+    }
+    
+    else if(index == 1)
+    {
+        while(temporalQueue.size() > 0)
+        {
+            val = temporalQueue.front();
+            sum = sum + val[1];
+            temporalQueue.pop();
+        }
     }
     
     
@@ -362,18 +364,27 @@ float PluginDajeAudioProcessorEditor::fullGas(std::queue<float> temporalQueue)
 
 
 //considero i sample del low-mid range, che vanno dall' 8° al 18° sample del fftData (sono 11 sample)
-float PluginDajeAudioProcessorEditor::performEnergyLowMidFFT(){
+float PluginDajeAudioProcessorEditor::performEnergyFFT(int index){
     
     float sum = 0;
     
-    
-    for (int i = 7; i <= 17; i++) {
+    if(index == 0)
+    {
+        for (int i = 1; i <= 2; i++) {  //KICK
+            sum = sum + processor.getFFTData()[i];
+            //printf("%.4f\n", processor.getFFTData()[i]);
+        }
+        sum = sum / ((130/43 - 60/43) * 1); //numero canali;
+    }
+    else if(index == 1)
+    {
+        for (int i = 7; i <= 17; i++) {  //SNARE
         sum = sum + processor.getFFTData()[i];
         //printf("%.4f\n", processor.getFFTData()[i]);
+        }
+        sum = sum / ((750/43 - 301/43) * 1); //numero canali;
     }
-    
-    
-    return sum / 11;
+    return sum;
 }
 
 
@@ -385,16 +396,23 @@ float PluginDajeAudioProcessorEditor::performEnergyLowMidFFT(){
 //}
 
 
-float PluginDajeAudioProcessorEditor::thresholdCalculus() {
+void PluginDajeAudioProcessorEditor::thresholdCalculus() {
     
-    std::queue<float> temporalQueue = energyHistory;
-    float average=fullGas(temporalQueue);
+    std::queue<std::vector<float>> temporalQueue = energyHistory;
     
-    std::queue<float> tempQueue = energyHistory;
+    float average[2];
+    average[0] = averageQueue(temporalQueue, 0);
+    average[1] = averageQueue(temporalQueue, 1);
+    
+    temporalQueue = energyHistory;
     //float average = averageEnergyHistory();
-    float variance = varianceEnergyHistory(average, tempQueue);
-    return (-0.0025714 * variance)*average + 1.5142857;
-    //return (-15 * variance + 1.55)*average;
+    float variance[2];
+    variance[0] = varianceEnergyHistory(average[0], temporalQueue, 0);
+    variance[1] = varianceEnergyHistory(average[1], temporalQueue, 1);
+    //return (-0.0025714 * variance)*average + 1.5142857;
+    
+    BPMthreshold[0] = (-15 * variance[0] + 1.55) * average[0];
+    BPMthreshold[1] = (-15 * variance[1] + 1.55) * average[1];
 }
 
 
@@ -406,22 +424,36 @@ float PluginDajeAudioProcessorEditor::thresholdCalculus() {
 //    return sum / dim;
 //}
 
-float PluginDajeAudioProcessorEditor::varianceEnergyHistory(float average, std::queue<float> tempQueue) {
-    float sum = 0, val;
+float PluginDajeAudioProcessorEditor::varianceEnergyHistory(float average, std::queue<std::vector<float>> tempQueue, int index) {
+    
+    std::vector<float> val;
+    float sum = 0;
+    
+    if(index == 0)
+    {
+        while(tempQueue.size() > 0)
+        {
+            val=tempQueue.front();
+            sum = sum + (val[0] - average)*(val[0] - average);
+            tempQueue.pop();
+        }
+    }
+    
+    else if(index == 1)
+    {
+        while(tempQueue.size() > 0)
+        {
+            val=tempQueue.front();
+            sum = sum + (val[1] - average)*(val[1] - average);
+            tempQueue.pop();
+        }
+    }
+    
+    
+    return sum/dim;
     //for (int i = 0; i < dim; i++) {
     //    sum = sum + (energyHistory[i] - average)*(energyHistory[i] - average);
     //}
-    
-    while(tempQueue.size()>0)
-    {
-        val=tempQueue.front();
-        
-        
-        sum = sum + (val - average)*(val - average);
-        tempQueue.pop();
-        
-    }
-    return sum / dim;
 }
 
 

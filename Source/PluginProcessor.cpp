@@ -138,7 +138,7 @@ void PluginDajeAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuff
 	for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
 		buffer.clear(i, 0, buffer.getNumSamples());
 
-	for (int channel = 0; channel < 1/*totalNumInputChannels*/; ++channel)
+	for (int channel = 0; channel < totalNumInputChannels; ++channel)
 	{
         
 		auto* channelData = buffer.getReadPointer(channel);
@@ -147,7 +147,8 @@ void PluginDajeAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuff
         
 		for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
 		{
-
+            
+            
             //if(channel==0){
             //    leftChannel[sample] = buffer.getSample(0, sample);
             //}
@@ -171,8 +172,10 @@ void PluginDajeAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuff
 			//    sendChangeMessage();
 			//}
 			// count++;
-			//if (count > getSampleRate()/2) {
-			//sendChangeMessage();
+			//if (count > getSampleRate()) {
+            //    //printf("ZZ: %d\n", count);
+            //    printf("%d\n", buffer.getNumSamples());
+			////sendChangeMessage();
 			//count = 0;
 			// }
 
@@ -226,7 +229,7 @@ double PluginDajeAudioProcessor::setThreshold(double value) {
 
 void PluginDajeAudioProcessor::pushNextSampleIntoFifo(float sample) noexcept
 {
-	if (fifoIndex == fftSize)    // [8]
+	if (fifoIndex == fftSize/2)    // [8]
 	{
 		if (!nextFFTBlockReady) // [9]
 		{

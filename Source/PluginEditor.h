@@ -42,21 +42,21 @@ public:
 	void timerCallback() override;
 
     void findRangeValueFunction(float* fftData );
-    void scaleFunction(float min,float max,float* data);
+    void scaleFunction(float* data);
     
     //void findRangeValueFunction(float *data);
     //void scaleFunction(float min,float max,float* data);
     
 	//Beat detection methods=========================
 	void beatDetection();
-	float performEnergyFFT();
-    float performEnergyLowMidFFT();
+	//float performEnergyFFT();
+    float performEnergyFFT(int index);
 	void fillEnergyHistory(float energy);
-	float thresholdCalculus();
+	void thresholdCalculus();
 	float averageEnergyHistory();
-	float varianceEnergyHistory(float average, std::queue<float> tempQueue);
+	float varianceEnergyHistory(float average, std::queue<std::vector<float>> tempQueue, int index);
 
-    float fullGas(std::queue<float> temporalQueue);
+    float averageQueue(std::queue<std::vector<float>> temporalQueue, int index);
     void fillBPMQueue(float firstTime);
     
     void BPMDetection(float timeNow);
@@ -89,20 +89,23 @@ private:
     int oldCount=0;
     int energyIndex = 0;
     
-    std::queue<float> energyHistory;
+    std::queue<std::vector<float>> energyHistory;
     
     std::priority_queue<float> bpmQueue;
 	
     
-    float BPMthreshold = 0;
+    float BPMthreshold[2];
     float maxThresh = 0;
     
     float timeAverage=0;
     int numBeat=0;
     float BPM=0;
-    float firstTime=0;
+    float prevTime=0;
     
+    float minAbs=0;
+    float maxAbs=0;
     
+    bool fftReady = false;
    
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginDajeAudioProcessorEditor)
 };

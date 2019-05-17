@@ -118,7 +118,7 @@ void PluginDajeAudioProcessorEditor::setNoteNumber(int noteNumber)
     
     float timeNow = Time::getMillisecondCounterHiRes() * 0.001;
     
-    if(timeNow - prevTime - startTime >0.3)
+    if(timeNow - prevTime - startTime > 0.3)
     {
         BPMDetection(timeNow);
         
@@ -134,16 +134,32 @@ void PluginDajeAudioProcessorEditor::setNoteNumber(int noteNumber)
    
 }
 
-void PluginDajeAudioProcessorEditor::BPMDetection(float timeNow)
+void PluginDajeAudioProcessorEditor::BPMDetection(float timeNow) 
 {
-    numBeat++;
-    if(numBeat > 1)
-        timeAverage = (timeAverage * (numBeat - 1) + (timeNow - prevTime - startTime)) / numBeat;
-    
-    prevTime = timeNow - startTime;
-    
-    if(numBeat > 1)
-        BPM = 60 / timeAverage;
+	deltaT = timeNow - prevTime - startTime;
+	deltaTQueue.push(deltaT);
+	
+	numBeat++;
+
+	BPMsum = BPMsum + deltaT;
+	BPMsumq = BPMsumq + deltaT * deltaT;
+
+	prevTime = timeNow - startTime;
+	
+	if (numBeat >= 4)
+	{
+		float av = BPMsum / 4;
+		float var = BPMsumq / 4 - (av * av);
+		if (var < varianceBeat)
+		{
+			BPM = 60 / av;
+			varianceBeat = var;
+		}
+		BPMsum = BPMsum - deltaTQueue.front();
+		BPMsumq = BPMsumq - deltaTQueue.front() * deltaTQueue.front();
+		deltaTQueue.pop();
+		numBeat--;
+	}
 }
 
 void PluginDajeAudioProcessorEditor::logMessage(const String& m)

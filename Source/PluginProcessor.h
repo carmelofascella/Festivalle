@@ -64,29 +64,30 @@ public:
 	enum
 	{
 		fftOrder = 10,           // [1]
-		fftSize = 1 << fftOrder // [2]
+		fftSize = 1024  // [2]
 	};
 
-	void pushNextSampleIntoFifo(float sample) noexcept;
+	void pushNextSampleIntoFifo(float sample, int channel) noexcept;
 
-
-
-	float* getFFTData();
-	float getFFTDataIndex(int index);
+	/*float* getFFTData();
+	float getFFTDataIndex(int index);*/
 
 	bool getNextFFTBlockReady();
 	void setNextFFTBlockReady(bool setup);
-    
-    
+
+	int numSample = 0;
+
+	float fifoL[fftSize];           // [4]
+	float fifoR[fftSize];
+	int fifoIndexL = 0;              // [6]
+	int fifoIndexR = 0;
+	float fftDataL[fftSize*2];    // [5]
+	float fftDataR[fftSize*2];
     
 private:
 	double rawVolume = 1;
 	double threshold;
 	int count = 0;
-
-	float fifo[fftSize];           // [4]
-	int fifoIndex = 0;              // [6]
-	float fftData[2 * fftSize];    // [5]
 
 	bool nextFFTBlockReady = false; // [7]
 

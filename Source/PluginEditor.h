@@ -41,8 +41,8 @@ public:
 	void drawNextLineOfSpectrogram();
 	void timerCallback() override;
 
-    void findRangeValueFunction(float* fftData );
-    void scaleFunction(float* data);
+    void findRangeValueFunction(float* fftData, int index);
+    void scaleFunction(float* data, int index);
     
     //void findRangeValueFunction(float *data);
     //void scaleFunction(float min,float max,float* data);
@@ -79,7 +79,7 @@ private:
 	Image spectrogramImage;
 
 	//44100 / fftSize (modificarlo se serve)
-	int dim = round(44100 / 1024);
+	int dim = round(processor.getSampleRate() / processor.fftSize);
     
 	//float energyHistory[43];
     //float energyHistoryOld[43];
@@ -104,8 +104,11 @@ private:
     
     float minAbs=0;
     float maxAbs=0;
-    
-    bool fftReady = false;
+
+	int kickmin = 0;
+	int kickmax = 0;
+	int snaremin = 0;
+	int snaremax = 0;
    
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginDajeAudioProcessorEditor)
 };

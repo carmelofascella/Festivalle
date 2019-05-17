@@ -135,6 +135,8 @@ void PluginDajeAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuff
 	auto totalNumInputChannels = getTotalNumInputChannels();
 	auto totalNumOutputChannels = getTotalNumOutputChannels();
 
+	numSample = buffer.getNumSamples();
+
 	for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
 		buffer.clear(i, 0, buffer.getNumSamples());
 
@@ -143,12 +145,9 @@ void PluginDajeAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuff
         
 		auto* channelData = buffer.getReadPointer(channel);
         
-        
-        
 		for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
 		{
-            
-            
+			
             //if(channel==0){
             //    leftChannel[sample] = buffer.getSample(0, sample);
             //}
@@ -158,7 +157,7 @@ void PluginDajeAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuff
                 //
                 //totChannel[sample] = (leftChannel[sample])*(leftChannel[sample]) + (rightChannel[sample]*rightChannel[sample]);
                 
-                pushNextSampleIntoFifo(channelData[sample]);
+                pushNextSampleIntoFifo(channelData[sample], channel);
             //}
 			//channelData[sample] = buffer.getSample(channel, sample) * rawVolume;
            
@@ -227,29 +226,46 @@ double PluginDajeAudioProcessor::setThreshold(double value) {
 	return threshold = value;
 }
 
-void PluginDajeAudioProcessor::pushNextSampleIntoFifo(float sample) noexcept
+void PluginDajeAudioProcessor::pushNextSampleIntoFifo(float sample, int channel) noexcept
 {
-	if (fifoIndex == fftSize/2)    // [8]
+	if (channel == 0)
 	{
-		if (!nextFFTBlockReady) // [9]
+		if (fifoIndexL == fftSize)    // [8]
 		{
-			zeromem(fftData, sizeof(fftData));
-			memcpy(fftData, fifo, sizeof(fifo));
-			nextFFTBlockReady = true;
+			if (!nextFFTBlockReady) // [9]
+			{
+				zeromem(fftDataL, sizeof(fftDataL));
+				memcpy(fftDataL, fifoL, sizeof(fifoL));
+				//nextFFTBlockReady = true;
+			}
+			fifoIndexL = 0;
 		}
-		fifoIndex = 0;
+		fifoL[fifoIndexL++] = sample;  // [9]
 	}
-	fifo[fifoIndex++] = sample;  // [9]
+	else if(channel == 1)
+	{
+		if (fifoIndexR == fftSize)    // [8]
+		{
+			if (!nextFFTBlockReady) // [9]
+			{
+				zeromem(fftDataR, sizeof(fftDataR));
+				memcpy(fftDataR, fifoR, sizeof(fifoR));
+				nextFFTBlockReady = true;
+			}
+			fifoIndexR = 0;
+		}
+		fifoR[fifoIndexR++] = sample;  // [9]
+	}
 }
 
 
-float* PluginDajeAudioProcessor::getFFTData() {
+/*float* PluginDajeAudioProcessor::getFFTData() {
 	return fftData;
 }
 
 float PluginDajeAudioProcessor::getFFTDataIndex(int index) {
 	return fftData[index];
-}
+}*/
 
 bool PluginDajeAudioProcessor::getNextFFTBlockReady() {
 	return nextFFTBlockReady;

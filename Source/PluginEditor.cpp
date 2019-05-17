@@ -24,6 +24,11 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
         midiOutput = MidiOutput::openDevice(portIndex); //WINDOWS
     else
         midiOutput = MidiOutput::openDevice(0); //MAC
+
+	kickmin = round(60 / dim);
+	kickmax = round(130 / dim);
+	snaremin = round(301 / dim);
+	snaremax = round(750 / dim);
     
 
 	addAndMakeVisible(buttonMidi);
@@ -192,28 +197,29 @@ void PluginDajeAudioProcessorEditor::drawNextLineOfSpectrogram()
     //}
     //printf("\n");
     
-	forwardFFT.performFrequencyOnlyForwardTransform(processor.getFFTData());                         // [2]
+	forwardFFT.performFrequencyOnlyForwardTransform(processor.fftDataL);                         // [2]
+	forwardFFT.performFrequencyOnlyForwardTransform(processor.fftDataR);
     //printf("\nwe");
     
-    findRangeValueFunction(processor.getFFTData());
-    
+    findRangeValueFunction(processor.fftDataL, 0);
+	findRangeValueFunction(processor.fftDataR, 1);
+
     //findRangeValueFunction(processor.getFFTData());     //da qui parte il processo di normalizzazione, per ora commentato perchè ho                                   visto che funziona meglio senza (la normalizzazione funziona)
     //for(int i=0; i<processor.fftSize; i++){
     //    printf("%.2f ", processor.getFFTData()[i]);
     //}
     //printf("\n");
-    //if(fftReady)
-    //{
-        beatDetection();
-    //}
-	auto maxLevel = FloatVectorOperations::findMinAndMax(processor.getFFTData(), processor.fftSize / 2);                      // [3]
+    
+	beatDetection();
+	
+	/*auto maxLevel = FloatVectorOperations::findMinAndMax(processor.getFFTData(), processor.fftSize / 2);                      // [3]
 	for (auto y = 1; y < imageHeight; ++y)                                                           // [4]
 	{
 		auto skewedProportionY = 1.0f - std::exp(std::log(y / (float)imageHeight) * 0.2f);
 		auto fftDataIndex = jlimit(0, processor.fftSize / 2, (int)(skewedProportionY * processor.fftSize / 2));
 		auto level = jmap(processor.getFFTDataIndex(fftDataIndex), 0.0f, jmax(maxLevel.getEnd(), 1e-5f), 0.0f, 1.0f);
 		spectrogramImage.setPixelAt(rightHandEdge, y, Colour::fromHSV(level, 1.0f, level, 1.0f));   // [5]
-	}
+	}*/
 }
 
 void PluginDajeAudioProcessorEditor::timerCallback()
@@ -226,7 +232,7 @@ void PluginDajeAudioProcessorEditor::timerCallback()
 	}
 }
 
-void PluginDajeAudioProcessorEditor::findRangeValueFunction(float* data)
+void PluginDajeAudioProcessorEditor::findRangeValueFunction(float* data, int index)
 {
     //float* data = processor.getFFTData();
     
@@ -239,19 +245,22 @@ void PluginDajeAudioProcessorEditor::findRangeValueFunction(float* data)
     
     
     
-    scaleFunction(data);
+    scaleFunction(data, index);
    
 }
 
-void PluginDajeAudioProcessorEditor::scaleFunction(float* data)
+void PluginDajeAudioProcessorEditor::scaleFunction(float* data, int index)
 {
-    
-    for(int i=0; i<processor.fftSize; i++){
-       
-        //processor.getFFTData()[i] =  ((data[i]-min) * (1-(-1))) / ((max-min)+(-1))  ;
-        processor.getFFTData()[i] = 1 *((data[i] - minAbs)/(maxAbs - minAbs)) -0;
-    }
-    
+    if(index == 0)
+		for(int i=0; i<processor.fftSize; i++){
+			//processor.getFFTData()[i] =  ((data[i]-min) * (1-(-1))) / ((max-min)+(-1))  ;
+			processor.fftDataL[i] = 1 *((data[i] - minAbs)/(maxAbs - minAbs)) -0;
+		}
+	else
+		for (int i = 0; i<processor.fftSize; i++) {
+			//processor.getFFTData()[i] =  ((data[i]-min) * (1-(-1))) / ((max-min)+(-1))  ;
+			processor.fftDataR[i] = 1 * ((data[i] - minAbs) / (maxAbs - minAbs)) - 0;
+		}
     
 }
 
@@ -311,7 +320,7 @@ void PluginDajeAudioProcessorEditor::beatDetection() {
         //printf("Thresh: %.4f   +   energy: %.4f    +dim: %d   \n", BPMthreshold[0], energyRange[0], energyHistory.size());
         
         
-        if (energyRange[0] - 0.05 > BPMthreshold[0] /*|| energyRange[1] - 0.005 > BPMthreshold[1]*/) {        //confronto con 1 secondo di delay
+        if (energyRange[0] - 0.05 > BPMthreshold[0] || energyRange[1] - 0.005 > BPMthreshold[1]) {        //confronto con 1 secondo di delay
             setNoteNumber(80);
             //printf("\n");
             //printf("BEAT\n");
@@ -359,7 +368,7 @@ float PluginDajeAudioProcessorEditor::averageQueue(std::queue<std::vector<float>
     
     return sum/dim;
     
-
+	
 }
 
 
@@ -370,19 +379,19 @@ float PluginDajeAudioProcessorEditor::performEnergyFFT(int index){
     
     if(index == 0)
     {
-        for (int i = 1; i <= 2; i++) {  //KICK
-            sum = sum + processor.getFFTData()[i];
+        for (int i = kickmin; i <= kickmax; i++) {  //KICK
+            sum = sum + processor.fftDataL[i] + processor.fftDataR[i];
             //printf("%.4f\n", processor.getFFTData()[i]);
         }
-        sum = sum / ((130/43 - 60/43) * 1); //numero canali;
+        sum = sum / ((130/dim - 60/dim) * 2); //numero canali;
     }
     else if(index == 1)
     {
-        for (int i = 7; i <= 17; i++) {  //SNARE
-        sum = sum + processor.getFFTData()[i];
+        for (int i = snaremin; i <= snaremax; i++) {  //SNARE   //OCCHIOOOOOO
+        sum = sum + processor.fftDataL[i] + processor.fftDataR[i];
         //printf("%.4f\n", processor.getFFTData()[i]);
         }
-        sum = sum / ((750/43 - 301/43) * 1); //numero canali;
+        sum = sum / ((750/dim - 301/dim) * 2); //numero canali;
     }
     return sum;
 }

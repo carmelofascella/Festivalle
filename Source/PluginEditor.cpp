@@ -136,20 +136,22 @@ void PluginDajeAudioProcessorEditor::setNoteNumber(int noteNumber)
 
 void PluginDajeAudioProcessorEditor::BPMDetection(float timeNow) 
 {
-	deltaT = timeNow - prevTime - startTime;
+	float deltaT = timeNow - prevTime - startTime;
 	deltaTQueue.push(deltaT);
 	
 	numBeat++;
+
+	buttonMidi.setButtonText((String)numBeat);
 
 	BPMsum = BPMsum + deltaT;
 	BPMsumq = BPMsumq + deltaT * deltaT;
 
 	prevTime = timeNow - startTime;
 	
-	if (numBeat >= 4)
+	if (numBeat >= numBeatSize)
 	{
-		float av = BPMsum / 4;
-		float var = BPMsumq / 4 - (av * av);
+		float av = BPMsum / numBeatSize;
+		float var = BPMsumq / numBeatSize - (av * av);
 		if (var < varianceBeat)
 		{
 			BPM = 60 / av;

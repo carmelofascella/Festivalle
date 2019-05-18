@@ -101,9 +101,9 @@ private:
 	float BPMsumq = 0;
 	float varianceBeat = 50; //alta all'inizio
 	int numBeat=0;
+	int numBeatSize = 12;
     float BPM=0;
 	float prevTime = 0;
-	float deltaT = 0;
     
 	std::queue<float> deltaTQueue;
 

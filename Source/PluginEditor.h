@@ -60,6 +60,8 @@ public:
     void fillBPMQueue(float firstTime);
     
     void BPMDetection(float timeNow);
+    void manualBPM();
+    
     void medianFilterFunction();
 private:
 	// This reference is provided as a quick way for your editor to
@@ -67,8 +69,13 @@ private:
 	PluginDajeAudioProcessor& processor;
 	TextButton buttonMidi;
 	TextEditor midiMessagesBox;
+    
+    TextButton tapTempo;
+    TextButton manualMode;
+    bool onOff = false;
 
 	Slider thresholdSlider;
+    Slider provaSlider;
 
 	int midiChannel = 10;
 	double startTime;
@@ -100,12 +107,13 @@ private:
 	float BPMsum = 0;
 	float BPMsumq = 0;
 	float varianceBeat = 50; //alta all'inizio
-	int numBeat=0;
+	int numBeat = 0;
 	int numBeatSize = 12;
-    float BPM=0;
-	float prevTime = 0;
-    
+    int BPM = 0;
+    float prevTime = 0;
 	std::queue<float> deltaTQueue;
+    
+    float timeAverage = 0; //manual mode
 
     float minAbs=0;
     float maxAbs=0;

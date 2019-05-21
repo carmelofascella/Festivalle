@@ -34,13 +34,43 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 	addAndMakeVisible(buttonMidi);
 	buttonMidi.setButtonText("Button Midi (81)");
 	buttonMidi.onClick = [this] { setNoteNumber(81); };
+    
+    addAndMakeVisible(tapTempo);
+    tapTempo.setButtonText("Tap Tempo");
+    tapTempo.onClick = [this] { if(onOff) manualBPM(); };
+    
+    addAndMakeVisible(manualMode);
+    manualMode.setButtonText("Manual Mode: off");
+    manualMode.onClick = [this] {
+        onOff = !onOff;
+        if(onOff) {
+            numBeat = 0;
+            timeAverage = 0;
+            manualMode.setButtonText("Manual Mode: on");
+        }
+        else {
+            BPMsum = 0;
+            BPMsumq = 0;
+            varianceBeat = 50; //alta all'inizio
+            numBeat = 0;
+            prevTime = 0;
+            while(!deltaTQueue.empty()) {
+                deltaTQueue.pop();
+            }
+            manualMode.setButtonText("Manual Mode: off");
+        }
+    };
 
 	addAndMakeVisible(thresholdSlider);
 	thresholdSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
-	thresholdSlider.setRange(0.1, 10);
+	thresholdSlider.setRange(-50, 50);
 	thresholdSlider.setValue(5);
 	processor.setThreshold(thresholdSlider.getValue());
 	thresholdSlider.addListener(this);
+
+    addAndMakeVisible(provaSlider);
+    provaSlider.setRange(-50, 50);
+    provaSlider.setValue(5);
 
 	addAndMakeVisible(midiMessagesBox);
 	midiMessagesBox.setMultiLine(true);
@@ -83,6 +113,12 @@ void PluginDajeAudioProcessorEditor::resized()
 	thresholdSlider.setBounds(buttonsBounds.getX(), 50, buttonsBounds.getWidth(), 20);
 
 	midiMessagesBox.setBounds(getLocalBounds().withWidth(halfWidth).withX(halfWidth).reduced(10));
+    
+    provaSlider.setBounds(buttonsBounds.getX(), 50, buttonsBounds.getWidth(), 60);
+    
+    tapTempo.setBounds(buttonsBounds.getX(), 140, buttonsBounds.getWidth(), 20);
+    
+    manualMode.setBounds(buttonsBounds.getX(), 170, buttonsBounds.getWidth(), 20);
 }
 
 //MIDI==========================================================================
@@ -121,13 +157,9 @@ void PluginDajeAudioProcessorEditor::setNoteNumber(int noteNumber)
     if(timeNow - prevTime - startTime > 0.3)
     {
         BPMDetection(timeNow);
-        
         buttonMidi.setButtonText((String)BPM);
-        
         message.setTimeStamp(timeNow - startTime);
-        
         midiOutput->sendMessageNow(message);
-        
         addMessageToList(message);
     }
     
@@ -136,25 +168,27 @@ void PluginDajeAudioProcessorEditor::setNoteNumber(int noteNumber)
 
 void PluginDajeAudioProcessorEditor::BPMDetection(float timeNow) 
 {
-	float deltaT = timeNow - prevTime - startTime;
-	deltaTQueue.push(deltaT);
-	
-	numBeat++;
+    float deltaT = timeNow - prevTime - startTime;
+    deltaTQueue.push(deltaT);
+    
+    numBeat++;
 
-	buttonMidi.setButtonText((String)numBeat);
-
-	BPMsum = BPMsum + deltaT;
-	BPMsumq = BPMsumq + deltaT * deltaT;
-
+	//buttonMidi.setButtonText((String)numBeat);
 	prevTime = timeNow - startTime;
 	
-	if (numBeat >= numBeatSize)
+    BPMsum = BPMsum + deltaT;
+    BPMsumq = BPMsumq + deltaT * deltaT;
+    
+    if (numBeat >= numBeatSize)
 	{
-		float av = BPMsum / numBeatSize;
-		float var = BPMsumq / numBeatSize - (av * av);
+		float av = BPMsum / (numBeatSize);
+		float var = BPMsumq / (numBeatSize) - (av * av);
+        //float var = BPMsumq / (numBeatSize-1) + (av * av * numBeatSize) / (numBeatSize - 1) - (2 * av * BPMsum) / (numBeatSize - 1);
+        thresholdSlider.setValue(var);
+        provaSlider.setValue(varianceBeat);
 		if (var < varianceBeat)
 		{
-			BPM = 60 / av;
+			BPM = round(60 / av);
 			varianceBeat = var;
 		}
 		BPMsum = BPMsum - deltaTQueue.front();
@@ -162,6 +196,28 @@ void PluginDajeAudioProcessorEditor::BPMDetection(float timeNow)
 		deltaTQueue.pop();
 		numBeat--;
 	}
+}
+
+void PluginDajeAudioProcessorEditor::manualBPM()
+{
+    float timeNow = Time::getMillisecondCounterHiRes() * 0.001;
+    auto message = MidiMessage::controllerEvent(midiChannel, 0, 65);
+    
+    numBeat++;
+    
+    if(numBeat > 1)
+        timeAverage = (timeAverage * (numBeat - 2) + (timeNow - prevTime - startTime)) / (numBeat - 1);
+    
+    prevTime = timeNow - startTime;
+    
+    if(numBeat > 1) {
+        BPM = round(60 / timeAverage);
+        buttonMidi.setButtonText((String)BPM);
+    }
+    
+    message.setTimeStamp(timeNow - startTime);
+    midiOutput->sendMessageNow(message);
+    addMessageToList(message);
 }
 
 void PluginDajeAudioProcessorEditor::logMessage(const String& m)
@@ -227,8 +283,8 @@ void PluginDajeAudioProcessorEditor::drawNextLineOfSpectrogram()
     //    printf("%.2f ", processor.getFFTData()[i]);
     //}
     //printf("\n");
-    
-	beatDetection();
+    if(!onOff)
+        beatDetection();
 	
 	/*auto maxLevel = FloatVectorOperations::findMinAndMax(processor.getFFTData(), processor.fftSize / 2);                      // [3]
 	for (auto y = 1; y < imageHeight; ++y)                                                           // [4]
@@ -401,7 +457,7 @@ float PluginDajeAudioProcessorEditor::performEnergyFFT(int index){
             sum = sum + processor.fftDataL[i] + processor.fftDataR[i];
             //printf("%.4f\n", processor.getFFTData()[i]);
         }
-        sum = sum / ((130/dim - 60/dim) * 2); //numero canali;
+        sum = sum / ((kickmax - kickmin) * 2); //numero canali;
     }
     else if(index == 1)
     {
@@ -409,7 +465,7 @@ float PluginDajeAudioProcessorEditor::performEnergyFFT(int index){
         sum = sum + processor.fftDataL[i] + processor.fftDataR[i];
         //printf("%.4f\n", processor.getFFTData()[i]);
         }
-        sum = sum / ((750/dim - 301/dim) * 2); //numero canali;
+        sum = sum / ((snaremax-snaremin) * 2); //numero canali;
     }
     return sum;
 }

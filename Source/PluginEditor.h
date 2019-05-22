@@ -59,7 +59,7 @@ public:
     float averageQueue(std::queue<std::vector<float>> temporalQueue, int index);
     void fillBPMQueue(float firstTime);
     
-    void BPMDetection(float timeNow);
+    void BPMDetection(double timeNow);
     void manualBPM();
     
     void medianFilterFunction();
@@ -67,15 +67,16 @@ private:
 	// This reference is provided as a quick way for your editor to
 	// access the processor object that created it.
 	PluginDajeAudioProcessor& processor;
-	TextButton buttonMidi;
 	TextEditor midiMessagesBox;
     
+	TextEditor actualBPM;
+	TextEditor actualVar;
+	TextEditor minimumVar;
+	TextEditor transientAttack;
+
     TextButton tapTempo;
     TextButton manualMode;
     bool onOff = false;
-
-	Slider thresholdSlider;
-    Slider provaSlider;
 
 	int midiChannel = 10;
 	double startTime;
@@ -104,16 +105,16 @@ private:
     float BPMthreshold[2];
     float maxThresh = 0;
     
-	float BPMsum = 0;
-	float BPMsumq = 0;
-	float varianceBeat = 50; //alta all'inizio
+	double BPMsum = 0;
+	double BPMsumq = 0;
+	double varianceBeat = 50; //alta all'inizio
 	int numBeat = 0;
 	int numBeatSize = 12;
     int BPM = 0;
-    float prevTime = 0;
-	std::queue<float> deltaTQueue;
+	double prevTime = 0;
+	std::queue<double> deltaTQueue;
     
-    float timeAverage = 0; //manual mode
+    double timeAverage = 0; //manual mode
 
     float minAbs=0;
     float maxAbs=0;
@@ -122,6 +123,10 @@ private:
 	int kickmax = 0;
 	int snaremin = 0;
 	int snaremax = 0;
+
+	bool beforeTransient = false;
+	bool transient = false;
+	double transientStartTime = 0;
    
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginDajeAudioProcessorEditor)
 };

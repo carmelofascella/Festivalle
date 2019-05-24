@@ -63,6 +63,10 @@ public:
     void manualBPM();
     
     void medianFilterFunction();
+
+	//Panning=========================================
+	void panningFeature();
+
 private:
 	// This reference is provided as a quick way for your editor to
 	// access the processor object that created it.
@@ -73,6 +77,7 @@ private:
 	TextEditor actualVar;
 	TextEditor minimumVar;
 	TextEditor transientAttack;
+	TextEditor panCount;
 
     TextButton tapTempo;
     TextButton manualMode;

@@ -64,7 +64,7 @@ public:
 	enum
 	{
 		fftOrder = 10,           // [1]
-		fftSize = 1024  // [2]
+		fftSize = 1 << fftOrder  // [2]
 	};
 
 	void pushNextSampleIntoFifo(float sample, int channel) noexcept;

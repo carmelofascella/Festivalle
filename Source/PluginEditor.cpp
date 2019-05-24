@@ -29,7 +29,10 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 	kickmax = round(130 / dim);
 	snaremin = round(301 / dim);
 	snaremax = round(750 / dim);
-    
+
+	addAndMakeVisible(panCount);
+	panCount.setText("panCount: calculate...");
+	panCount.setReadOnly(true);
 
 	addAndMakeVisible(actualBPM);
 	actualBPM.setText("BPM: calculate...");
@@ -114,15 +117,17 @@ void PluginDajeAudioProcessorEditor::resized()
 
 	midiMessagesBox.setBounds(getLocalBounds().withWidth(halfWidth).withX(halfWidth).reduced(10));
     
-    tapTempo.setBounds(buttonsBounds.getX(), 140, buttonsBounds.getWidth(), 20);
+    tapTempo.setBounds(buttonsBounds.getX(), 170, buttonsBounds.getWidth(), 20);
     
-    manualMode.setBounds(buttonsBounds.getX(), 170, buttonsBounds.getWidth(), 20);
+    manualMode.setBounds(buttonsBounds.getX(), 200, buttonsBounds.getWidth(), 20);
 	
 	actualVar.setBounds(buttonsBounds.getX(), 40, buttonsBounds.getWidth(), 20);
 
 	minimumVar.setBounds(buttonsBounds.getX(), 70, buttonsBounds.getWidth(), 20);
 
 	transientAttack.setBounds(buttonsBounds.getX(), 100, buttonsBounds.getWidth(), 20);
+
+	panCount.setBounds(buttonsBounds.getX(), 130, buttonsBounds.getWidth(), 20);
 }
 
 //MIDI==========================================================================
@@ -304,6 +309,8 @@ void PluginDajeAudioProcessorEditor::drawNextLineOfSpectrogram()
     //printf("\n");
     if(!onOff)
         beatDetection();
+
+	panningFeature();
 	
 	/*auto maxLevel = FloatVectorOperations::findMinAndMax(processor.getFFTData(), processor.fftSize / 2);                      // [3]
 	for (auto y = 1; y < imageHeight; ++y)                                                           // [4]
@@ -329,7 +336,7 @@ void PluginDajeAudioProcessorEditor::findRangeValueFunction(float* data, int ind
 {
     //float* data = processor.getFFTData();
     
-    for(int i=1; i<processor.fftSize; i++){
+    for(int i=1; i < PluginDajeAudioProcessor::fftSize; i++){
         if(data[i]>maxAbs)
             maxAbs = data[i];
         if(data[i]<minAbs)
@@ -345,12 +352,12 @@ void PluginDajeAudioProcessorEditor::findRangeValueFunction(float* data, int ind
 void PluginDajeAudioProcessorEditor::scaleFunction(float* data, int index)
 {
     if(index == 0)
-		for(int i=0; i<processor.fftSize; i++){
+		for(int i=0; i < PluginDajeAudioProcessor::fftSize; i++){
 			//processor.getFFTData()[i] =  ((data[i]-min) * (1-(-1))) / ((max-min)+(-1))  ;
 			processor.fftDataL[i] = 1 *((data[i] - minAbs)/(maxAbs - minAbs)) -0;
 		}
 	else
-		for (int i = 0; i<processor.fftSize; i++) {
+		for (int i = 0; i < PluginDajeAudioProcessor::fftSize; i++) {
 			//processor.getFFTData()[i] =  ((data[i]-min) * (1-(-1))) / ((max-min)+(-1))  ;
 			processor.fftDataR[i] = 1 * ((data[i] - minAbs) / (maxAbs - minAbs)) - 0;
 		}
@@ -566,6 +573,57 @@ float PluginDajeAudioProcessorEditor::varianceEnergyHistory(float average, std::
     //for (int i = 0; i < dim; i++) {
     //    sum = sum + (energyHistory[i] - average)*(energyHistory[i] - average);
     //}
+}
+
+void PluginDajeAudioProcessorEditor::panningFeature()
+{
+	float leftSPS[PluginDajeAudioProcessor::fftSize];
+	float rightSPS[PluginDajeAudioProcessor::fftSize];
+	float diffSPS[PluginDajeAudioProcessor::fftSize];
+	//float totSPS[fftSize];
+
+	float leftVal = 0;
+	float rightVal = 0;
+	int countPos = 0, countNeg = 0, countZeros = 0;
+
+	for (int i = 0; i < PluginDajeAudioProcessor::fftSize; i++)
+	{
+		leftVal = processor.fftDataL[i];
+		rightVal = processor.fftDataR[i];
+
+		leftSPS[i] = (abs(leftVal * rightVal)) / (abs(leftVal*leftVal));
+
+		rightSPS[i] = (abs(rightVal * leftVal)) / (abs(rightVal*rightVal));
+
+		diffSPS[i] = leftSPS[i] - rightSPS[i];
+
+		//totSPS[i] = 2 * ( (abs(leftVal * rightVal)) / ( abs(leftVal*leftVal) + abs(rightVal*rightVal)) );
+
+		//panSpectrum[i] = (1 - totSPS[i])*diffSPS[i];
+
+		if (diffSPS[i] > 0)
+		{
+			diffSPS[i] = 1;
+			countPos++;
+		}
+
+		else if (diffSPS[i] < 0)
+		{
+			diffSPS[i] = -1;
+			countNeg++;
+		}
+
+		else if (diffSPS[i] == 0)
+		{
+			diffSPS[i] = 0;
+			countZeros++;
+		}
+	}
+
+	if (countNeg > 850)
+	{
+		panCount.setText("POSITIVE COUNT: " + (String)countPos + "NEGATIVE COUNT: " + (String)countNeg + "ZERO COUNT: " + (String)countZeros);
+	}
 }
 
 

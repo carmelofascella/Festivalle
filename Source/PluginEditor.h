@@ -63,10 +63,6 @@ public:
     void manualBPM();
     
     void medianFilterFunction();
-    
-    void panningFeature();
-    
-
 private:
 	// This reference is provided as a quick way for your editor to
 	// access the processor object that created it.
@@ -77,8 +73,6 @@ private:
 	TextEditor actualVar;
 	TextEditor minimumVar;
 	TextEditor transientAttack;
-    
-    TextEditor panCount;
 
     TextButton tapTempo;
     TextButton manualMode;
@@ -133,10 +127,6 @@ private:
 	bool beforeTransient = false;
 	bool transient = false;
 	double transientStartTime = 0;
-    
-    int fftSize=0;
-    
-    float panSpectrum[1024];
    
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginDajeAudioProcessorEditor)
 };

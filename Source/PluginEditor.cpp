@@ -30,8 +30,7 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 	snaremin = round(301 / dim);
 	snaremax = round(750 / dim);
     
-    fftSize = processor.fftSize;
-    
+
 	addAndMakeVisible(actualBPM);
 	actualBPM.setText("BPM: calculate...");
 	actualBPM.setReadOnly(true);
@@ -65,8 +64,6 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
         }
     };
 
-    addAndMakeVisible(panCount);
-    
 	addAndMakeVisible(actualVar);
 	addAndMakeVisible(minimumVar);
 	addAndMakeVisible(transientAttack);
@@ -126,8 +123,6 @@ void PluginDajeAudioProcessorEditor::resized()
 	minimumVar.setBounds(buttonsBounds.getX(), 70, buttonsBounds.getWidth(), 20);
 
 	transientAttack.setBounds(buttonsBounds.getX(), 100, buttonsBounds.getWidth(), 20);
-    
-    panCount.setBounds(buttonsBounds.getX(), 130, buttonsBounds.getWidth(), 20);
 }
 
 //MIDI==========================================================================
@@ -307,25 +302,17 @@ void PluginDajeAudioProcessorEditor::drawNextLineOfSpectrogram()
     //    printf("%.2f ", processor.getFFTData()[i]);
     //}
     //printf("\n");
-    
-    /*
     if(!onOff)
         beatDetection();
-	*/
-    
-    panningFeature();
-    
-    /*
-	auto maxLevel = FloatVectorOperations::findMinAndMax(processor.getFFTData(), processor.fftSize / 2);                      // [3]
+	
+	/*auto maxLevel = FloatVectorOperations::findMinAndMax(processor.getFFTData(), processor.fftSize / 2);                      // [3]
 	for (auto y = 1; y < imageHeight; ++y)                                                           // [4]
 	{
 		auto skewedProportionY = 1.0f - std::exp(std::log(y / (float)imageHeight) * 0.2f);
 		auto fftDataIndex = jlimit(0, processor.fftSize / 2, (int)(skewedProportionY * processor.fftSize / 2));
 		auto level = jmap(processor.getFFTDataIndex(fftDataIndex), 0.0f, jmax(maxLevel.getEnd(), 1e-5f), 0.0f, 1.0f);
 		spectrogramImage.setPixelAt(rightHandEdge, y, Colour::fromHSV(level, 1.0f, level, 1.0f));   // [5]
-	}
-     */
-     
+	}*/
 }
 
 void PluginDajeAudioProcessorEditor::timerCallback()
@@ -580,59 +567,6 @@ float PluginDajeAudioProcessorEditor::varianceEnergyHistory(float average, std::
     //}
 }
 
-
-void PluginDajeAudioProcessorEditor::panningFeature()
-{
-    
-    float leftSPS[fftSize];
-    float rightSPS[fftSize];
-    float diffSPS[fftSize];
-    float totSPS[fftSize];
-    
-    float leftVal = 0;
-    float rightVal = 0;
-    int countPos=0, countNeg =0, countZeros = 0;
-    
-    for(int i=0; i<=fftSize ;i++)
-    {
-        leftVal = processor.fftDataL[i];
-        rightVal = processor.fftDataR[i];
-        leftSPS[i] = abs(leftVal * rightVal) / abs(leftVal*leftVal);
-        
-        rightSPS[i] = abs(leftVal * rightVal) / abs(rightVal*rightVal);
-        
-        diffSPS[i] = leftSPS[i] - rightSPS[i];
-        
-        //totSPS[i] = 2 * ( (abs(leftVal * rightVal)) / ( abs(leftVal*leftVal) + abs(rightVal*rightVal)) );
- 
-        //panSpectrum[i] = (1 - totSPS[i])*diffSPS[i];
-        
-        if(diffSPS[i]>0)
-        {
-            diffSPS[i] = 1;
-            countPos++;
-        }
-        
-        else if(diffSPS[i]<0)
-        {
-            diffSPS[i] = -1;
-            countNeg++;
-        }
-        
-        else if(diffSPS[i]==0)
-        {
-            diffSPS[i] = 0;
-            countZeros++;
-        }
-    }
-    
-    if(countPos>850)
-    {
-        panCount.setText("POSITIVE COUNT: " + (String)countPos + "NEGATIVE COUNT: " + (String)countNeg + "ZERO COUNT: " + (String)countZeros );
-    }
-    
-    
-}
 
 
 

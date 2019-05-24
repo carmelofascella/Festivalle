@@ -174,7 +174,7 @@ void PluginDajeAudioProcessorEditor::BPMDetection(double timeNow)
 {
 	if (transient)
 	{
-		if (timeNow - transientStartTime > 3)
+		if (timeNow - transientStartTime > 10)
 		{
 			transient = false;
 			transientAttack.setText("transientAttack: off");
@@ -372,6 +372,7 @@ void PluginDajeAudioProcessorEditor::beatDetection() {
 
 	if (energyRange[0] == 0 && energyRange[1] == 0 || isnan(energyRange[0]) && isnan(energyRange[1])) {
 		beforeTransient = true;   //vuoto prima dell'inizio dell'attacco
+		transientAttack.setText("transientAttack: off");
 	}
 	else if (beforeTransient) {
 		beforeTransient = false;

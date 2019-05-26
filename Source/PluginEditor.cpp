@@ -225,7 +225,7 @@ void PluginDajeAudioProcessorEditor::BPMDetection(double timeNow)
 void PluginDajeAudioProcessorEditor::manualBPM()
 {
     double timeNow = Time::getMillisecondCounterHiRes() * 0.001;
-    auto message = MidiMessage::controllerEvent(midiChannel, 0, 65);
+    auto message = MidiMessage::controllerEvent(midiChannel, 0, ((int)(Time::getMillisecondCounterHiRes()) % 128));
     
     numBeat++;
     
@@ -278,7 +278,7 @@ void PluginDajeAudioProcessorEditor::sliderValueChanged(Slider * slider)
 
 void PluginDajeAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
-	setNoteNumber(80);
+	setNoteNumber((int)(Time::getMillisecondCounterHiRes()) % 128);
 }
 
 
@@ -431,7 +431,7 @@ void PluginDajeAudioProcessorEditor::beatDetection() {
         
         
         if (energyRange[0] - 0.05 > BPMthreshold[0] || energyRange[1] - 0.005 > BPMthreshold[1]) {        //confronto con 1 secondo di delay
-            setNoteNumber(80);
+            setNoteNumber((int)(Time::getMillisecondCounterHiRes()) % 128);
             //printf("\n");
             //printf("BEAT\n");
             //for(int i=7; i<=17; i++){
@@ -577,53 +577,22 @@ float PluginDajeAudioProcessorEditor::varianceEnergyHistory(float average, std::
 
 void PluginDajeAudioProcessorEditor::panningFeature()
 {
-	float leftSPS[PluginDajeAudioProcessor::fftSize];
-	float rightSPS[PluginDajeAudioProcessor::fftSize];
-	float diffSPS[PluginDajeAudioProcessor::fftSize];
-	//float totSPS[fftSize];
-
-	float leftVal = 0;
-	float rightVal = 0;
-	int countPos = 0, countNeg = 0, countZeros = 0;
+	int panLeft = 0, panRight = 0;
 
 	for (int i = 0; i < PluginDajeAudioProcessor::fftSize; i++)
 	{
-		leftVal = processor.fftDataL[i];
-		rightVal = processor.fftDataR[i];
-
-		leftSPS[i] = (abs(leftVal * rightVal)) / (abs(leftVal*leftVal));
-
-		rightSPS[i] = (abs(rightVal * leftVal)) / (abs(rightVal*rightVal));
-
-		diffSPS[i] = leftSPS[i] - rightSPS[i];
-
-		//totSPS[i] = 2 * ( (abs(leftVal * rightVal)) / ( abs(leftVal*leftVal) + abs(rightVal*rightVal)) );
-
-		//panSpectrum[i] = (1 - totSPS[i])*diffSPS[i];
-
-		if (diffSPS[i] > 0)
+		if (processor.fftDataL[i] - processor.fftDataR[i] > 0)
 		{
-			diffSPS[i] = 1;
-			countPos++;
+			panLeft++;
+		}
+		else if (processor.fftDataL[i] - processor.fftDataR[i] < 0)
+		{
+			panRight++;
 		}
 
-		else if (diffSPS[i] < 0)
-		{
-			diffSPS[i] = -1;
-			countNeg++;
-		}
-
-		else if (diffSPS[i] == 0)
-		{
-			diffSPS[i] = 0;
-			countZeros++;
-		}
 	}
 
-	if (countNeg > 850)
-	{
-		panCount.setText("POSITIVE COUNT: " + (String)countPos + "NEGATIVE COUNT: " + (String)countNeg + "ZERO COUNT: " + (String)countZeros);
-	}
+	panCount.setText("L: " + (String)panLeft + " - R: " + (String)panRight);
 }
 
 

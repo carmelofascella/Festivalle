@@ -156,8 +156,9 @@ void PluginDajeAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuff
                 //rightChannel[sample] = buffer.getSample(1, sample);
                 //
                 //totChannel[sample] = (leftChannel[sample])*(leftChannel[sample]) + (rightChannel[sample]*rightChannel[sample]);
-                
-                pushNextSampleIntoFifo(channelData[sample], channel);
+
+
+                    pushNextSampleIntoFifo(channelData[sample], channel);
             //}
 			//channelData[sample] = buffer.getSample(channel, sample) * rawVolume;
            
@@ -275,3 +276,6 @@ void PluginDajeAudioProcessor::setNextFFTBlockReady(bool setup) {
 	nextFFTBlockReady = setup;
 }
 
+void PluginDajeAudioProcessor::setThreadBoolean(bool setup){
+    threadFlag = setup;
+}

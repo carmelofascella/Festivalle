@@ -59,6 +59,8 @@ public:
 
 	//==============================================================================
 	double setThreshold(double value);
+    
+    void setThreadBoolean(bool setup);
 	int prova = 10;
 
 	enum
@@ -94,6 +96,8 @@ private:
     float leftChannel[1024];
     float rightChannel[1024];
     float totChannel[1024];
+    
+    bool threadFlag=true;
     
 //==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginDajeAudioProcessor)

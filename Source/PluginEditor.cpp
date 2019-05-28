@@ -14,8 +14,12 @@ It contains the basic framework code for a JUCE plugin editor.
 //==============================================================================
 PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioProcessor& p)
 	: AudioProcessorEditor(&p), processor(p), startTime(Time::getMillisecondCounterHiRes() * 0.001),
-	forwardFFT(PluginDajeAudioProcessor::fftOrder), spectrogramImage(Image::RGB, 512, 512, true)
+	forwardFFT(PluginDajeAudioProcessor::fftOrder), spectrogramImage(Image::RGB, 512, 512, true), panFeature(processor), beatDetector(processor), spectralCentroid(processor)
 {
+    panFeature.addChangeListener(this);
+    beatDetector.addChangeListener(this);
+    spectralCentroid.addChangeListener(this);
+    
 	processor.addChangeListener(this);
 
     StringArray midiOutputList = MidiOutput::getDevices();
@@ -25,10 +29,6 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
     else
         midiOutput = MidiOutput::openDevice(0); //MAC
 
-	kickmin = round(60 / dim);
-	kickmax = round(130 / dim);
-	snaremin = round(301 / dim);
-	snaremax = round(750 / dim);
 
 	addAndMakeVisible(panCount);
 	panCount.setText("panCount: calculate...");
@@ -278,7 +278,27 @@ void PluginDajeAudioProcessorEditor::sliderValueChanged(Slider * slider)
 
 void PluginDajeAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
-	setNoteNumber((int)(Time::getMillisecondCounterHiRes()) % 128);
+
+    if(source == &panFeature )
+    {
+        //END OF THE PAN FEATURE THREAD (to be handle)
+        //printf("\n%d", panFeature.count);
+        
+    }
+    
+    
+    else if(source == &beatDetector)
+    {
+        //END OF THE BEAT DETECTION THREAD
+        setNoteNumber(beatDetector.beatTime);
+    }
+    
+    else if(source == &spectralCentroid)
+    {
+        //END OF THE SPECTRAL CENTROID THREAD (to be handle)
+
+    }
+    
 }
 
 
@@ -290,36 +310,25 @@ void PluginDajeAudioProcessorEditor::drawNextLineOfSpectrogram()
     
     
     
-    //for(int i=0; i<processor.fftSize; i++){
-    //    printf("%.2f ", processor.getFFTData()[i]);
-    //}
-    //printf("\n");
-    
 	forwardFFT.performFrequencyOnlyForwardTransform(processor.fftDataL);                         // [2]
 	forwardFFT.performFrequencyOnlyForwardTransform(processor.fftDataR);
-    //printf("\nwe");
     
     findRangeValueFunction(processor.fftDataL, 0);
 	findRangeValueFunction(processor.fftDataR, 1);
 
-    //findRangeValueFunction(processor.getFFTData());     //da qui parte il processo di normalizzazione, per ora commentato perchè ho                                   visto che funziona meglio senza (la normalizzazione funziona)
-    //for(int i=0; i<processor.fftSize; i++){
-    //    printf("%.2f ", processor.getFFTData()[i]);
-    //}
-    //printf("\n");
-    if(!onOff)
-        beatDetection();
-
-	panningFeature();
+    
 	
-	/*auto maxLevel = FloatVectorOperations::findMinAndMax(processor.getFFTData(), processor.fftSize / 2);                      // [3]
-	for (auto y = 1; y < imageHeight; ++y)                                                           // [4]
-	{
-		auto skewedProportionY = 1.0f - std::exp(std::log(y / (float)imageHeight) * 0.2f);
-		auto fftDataIndex = jlimit(0, processor.fftSize / 2, (int)(skewedProportionY * processor.fftSize / 2));
-		auto level = jmap(processor.getFFTDataIndex(fftDataIndex), 0.0f, jmax(maxLevel.getEnd(), 1e-5f), 0.0f, 1.0f);
-		spectrogramImage.setPixelAt(rightHandEdge, y, Colour::fromHSV(level, 1.0f, level, 1.0f));   // [5]
-	}*/
+    
+    if(!onOff)
+        beatDetector.run();         //START BEAT DETECTION THREAD
+    
+    panFeature.run();               //START PAN FEATURE THREAD
+    
+    spectralCentroid.run();         //START SPECTRAL CENTROID THREAD
+    
+    
+    
+
 }
 
 void PluginDajeAudioProcessorEditor::timerCallback()
@@ -363,238 +372,6 @@ void PluginDajeAudioProcessorEditor::scaleFunction(float* data, int index)
 		}
     
 }
-
-
-
-
-//assunzioni: ogni secondo devo aggiornare la threshold.
-//Per ogni fftData, mi calcolo l' energia del lowMidRange e lo confronto con la threshold
-//Se è maggiore, è un beat
-void PluginDajeAudioProcessorEditor::beatDetection() {
-
-    float energyRange[2];
-    
-    energyRange[0] = performEnergyFFT(0);   //calcolo energia del range low-mid del singolo buffer
-    energyRange[1] = performEnergyFFT(1);      
-
-	if (energyRange[0] == 0 && energyRange[1] == 0 || isnan(energyRange[0]) && isnan(energyRange[1])) {
-		beforeTransient = true;   //vuoto prima dell'inizio dell'attacco
-		transientAttack.setText("transientAttack: off");
-	}
-	else if (beforeTransient) {
-		beforeTransient = false;
-		transientAttack.setText("transientAttack: on");
-		transientStartTime = Time::getMillisecondCounterHiRes() * 0.001;
-		transient = true;  //inizio dell'attacco
-	}
-
-    //fillEnergyHistory(energyLowMid);
-    //printf("Energy: %.3f", energyLowMid);
-    
-    std::vector<float> fftResult;
-    fftResult.reserve(2);
-    for(int i = 0; i < 2; i++)
-    {
-        fftResult.push_back(energyRange[i]);
-    }
-    
-    energyHistory.push(fftResult);
-    
-    
-    //printf("energyIndex: %d\n", energyIndex%43);
-    
-    //if(energyHistory.size()>0)
-    //{
-    //    printf("testa della coda %d\n", energyHistory.size());
-    //printf("FRONT %.3f       ENERGY: %.3f\n", energyHistory.front(), energyLowMid);
-    //}
-    
-    
-   //for(int i=0;i<=1023; i++){
-   //    printf("%.2f ", processor.getFFTData()[i]);
-   //}
-   //printf("\n________________________________\n");
-    //printf("Thresh: %.4f   +   energy: %.4f    +   oldCount: %d\n", BPMthreshold, energyHistory.front() , oldCount);
-    
-    
-    
-    
-    if (energyIndex >= dim-1) {
-        thresholdCalculus();  //calcolus BPMThreshold
-        
-        
-        //for(int i=0; i<dim; i++){
-        //    energyHistoryOld[i] = energyHistory[i];
-        //}
-        
-        //printf("Thresh: %.4f   +   energy: %.4f    +dim: %d   \n", BPMthreshold[0], energyRange[0], energyHistory.size());
-        
-        
-        if (energyRange[0] - 0.05 > BPMthreshold[0] || energyRange[1] - 0.005 > BPMthreshold[1]) {        //confronto con 1 secondo di delay
-            setNoteNumber((int)(Time::getMillisecondCounterHiRes()) % 128);
-            //printf("\n");
-            //printf("BEAT\n");
-            //for(int i=7; i<=17; i++){
-            //    printf("sample: %f",processor.getFFTData()[i]);
-            //    printf("  ");
-            //}
-            //printf("\n");
-        }
-        
-        energyHistory.pop();
-        
-    }
-
-     energyIndex++;
-     
-}
-
-//fa la media dell energy history buffer
-float PluginDajeAudioProcessorEditor::averageQueue(std::queue<std::vector<float>> temporalQueue, int index)
-{
-    std::vector<float> val;
-    float sum = 0;
-    
-    if(index == 0)
-    {
-        while(temporalQueue.size() > 0)
-        {
-        val = temporalQueue.front();
-        sum = sum + val[0];
-        temporalQueue.pop();
-        }
-    }
-    
-    else if(index == 1)
-    {
-        while(temporalQueue.size() > 0)
-        {
-            val = temporalQueue.front();
-            sum = sum + val[1];
-            temporalQueue.pop();
-        }
-    }
-    
-    
-    return sum/dim;
-    
-	
-}
-
-
-//considero i sample del low-mid range, che vanno dall' 8° al 18° sample del fftData (sono 11 sample)
-float PluginDajeAudioProcessorEditor::performEnergyFFT(int index){
-    
-    float sum = 0;
-    
-    if(index == 0)
-    {
-        for (int i = kickmin; i <= kickmax; i++) {  //KICK
-            sum = sum + processor.fftDataL[i] + processor.fftDataR[i];
-            //printf("%.4f\n", processor.getFFTData()[i]);
-        }
-        sum = sum / ((kickmax - kickmin) * 2); //numero canali;
-    }
-    else if(index == 1)
-    {
-        for (int i = snaremin; i <= snaremax; i++) {  //SNARE   //OCCHIOOOOOO
-        sum = sum + processor.fftDataL[i] + processor.fftDataR[i];
-        //printf("%.4f\n", processor.getFFTData()[i]);
-        }
-        sum = sum / ((snaremax-snaremin) * 2); //numero canali;
-    }
-    return sum;
-}
-
-
-
-
-//void PluginDajeAudioProcessorEditor::fillEnergyHistory(float energy) {
-//    energyHistory[energyIndex] = energy;
-//    energyIndex++;
-//}
-
-
-void PluginDajeAudioProcessorEditor::thresholdCalculus() {
-    
-    std::queue<std::vector<float>> temporalQueue = energyHistory;
-    
-    float average[2];
-    average[0] = averageQueue(temporalQueue, 0);
-    average[1] = averageQueue(temporalQueue, 1);
-    
-    temporalQueue = energyHistory;
-    //float average = averageEnergyHistory();
-    float variance[2];
-    variance[0] = varianceEnergyHistory(average[0], temporalQueue, 0);
-    variance[1] = varianceEnergyHistory(average[1], temporalQueue, 1);
-    //return (-0.0025714 * variance)*average + 1.5142857;
-    
-    BPMthreshold[0] = (-15 * variance[0] + 1.55) * average[0];
-    BPMthreshold[1] = (-15 * variance[1] + 1.55) * average[1];
-}
-
-
-//float PluginDajeAudioProcessorEditor::averageEnergyHistory() {
-//    float sum = 0;
-//    for (int i = 0; i < dim; i++) {
-//        sum = sum + energyHistory.
-//    }
-//    return sum / dim;
-//}
-
-float PluginDajeAudioProcessorEditor::varianceEnergyHistory(float average, std::queue<std::vector<float>> tempQueue, int index) {
-    
-    std::vector<float> val;
-    float sum = 0;
-    
-    if(index == 0)
-    {
-        while(tempQueue.size() > 0)
-        {
-            val=tempQueue.front();
-            sum = sum + (val[0] - average)*(val[0] - average);
-            tempQueue.pop();
-        }
-    }
-    
-    else if(index == 1)
-    {
-        while(tempQueue.size() > 0)
-        {
-            val=tempQueue.front();
-            sum = sum + (val[1] - average)*(val[1] - average);
-            tempQueue.pop();
-        }
-    }
-    
-    
-    return sum/dim;
-    //for (int i = 0; i < dim; i++) {
-    //    sum = sum + (energyHistory[i] - average)*(energyHistory[i] - average);
-    //}
-}
-
-void PluginDajeAudioProcessorEditor::panningFeature()
-{
-	int panLeft = 0, panRight = 0;
-
-	for (int i = 0; i < PluginDajeAudioProcessor::fftSize; i++)
-	{
-		if (processor.fftDataL[i] - processor.fftDataR[i] > 0)
-		{
-			panLeft++;
-		}
-		else if (processor.fftDataL[i] - processor.fftDataR[i] < 0)
-		{
-			panRight++;
-		}
-
-	}
-
-	panCount.setText("L: " + (String)panLeft + " - R: " + (String)panRight);
-}
-
 
 
 

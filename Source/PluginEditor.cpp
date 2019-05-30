@@ -90,6 +90,74 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 
 	startTimerHz(60);
 	setSize(700, 500);
+    
+    addAndMakeVisible(button0);
+    addAndMakeVisible(button1);
+    addAndMakeVisible(button2);
+    addAndMakeVisible(button3);
+    addAndMakeVisible(button4);
+    addAndMakeVisible(button5);
+    addAndMakeVisible(button6);
+    addAndMakeVisible(button7);
+    addAndMakeVisible(button8);
+    addAndMakeVisible(button9);
+    addAndMakeVisible(button10);
+    addAndMakeVisible(button11);
+    addAndMakeVisible(button12);
+    addAndMakeVisible(button13);
+    addAndMakeVisible(button14);
+    addAndMakeVisible(button15);
+    addAndMakeVisible(button16);
+    addAndMakeVisible(button17);
+    addAndMakeVisible(button18);
+    addAndMakeVisible(button19);
+    addAndMakeVisible(button20);
+ 
+    button0.setButtonText((String)("0"));
+    button1.setButtonText((String)("1"));
+    button2.setButtonText((String)("2"));
+    button3.setButtonText((String)("3"));
+    button4.setButtonText((String)("4"));
+    button5.setButtonText((String)("5"));
+    button6.setButtonText((String)("6"));
+    button7.setButtonText((String)("7"));
+    button8.setButtonText((String)("8"));
+    button9.setButtonText((String)("9"));
+    button10.setButtonText((String)("10"));
+    button11.setButtonText((String)("11"));
+    button12.setButtonText((String)("12"));
+    button13.setButtonText((String)("13"));
+    button14.setButtonText((String)("14"));
+    button15.setButtonText((String)("15"));
+    button16.setButtonText((String)("16"));
+    button17.setButtonText((String)("17"));
+    button18.setButtonText((String)("18"));
+    button19.setButtonText((String)("19"));
+    button20.setButtonText((String)("20"));
+
+    
+    button0.onClick = [this] { setNoteNumber(0,120); };
+    button1.onClick = [this] { setNoteNumber(1,12); };
+    button2.onClick = [this] { setNoteNumber(2,121); };
+    button3.onClick = [this] { setNoteNumber(3,120); };
+    button4.onClick = [this] { setNoteNumber(4,12); };
+    button5.onClick = [this] { setNoteNumber(5,25); };
+    button6.onClick = [this] { setNoteNumber(6,12); };
+    button7.onClick = [this] { setNoteNumber(7,123); };
+    button8.onClick = [this] { setNoteNumber(8,121); };
+    button9.onClick = [this] { setNoteNumber(9,120); };
+    button10.onClick = [this] { setNoteNumber(10,12); };
+    button11.onClick = [this] { setNoteNumber(11,121); };
+    button12.onClick = [this] { setNoteNumber(12,120); };
+    button13.onClick = [this] { setNoteNumber(13,12); };
+    button14.onClick = [this] { setNoteNumber(14,121); };
+    button15.onClick = [this] { setNoteNumber(15,120); };
+    button16.onClick = [this] { setNoteNumber(16,12); };
+    button17.onClick = [this] { setNoteNumber(17,121); };
+    button18.onClick = [this] { setNoteNumber(18,120); };
+    button19.onClick = [this] { setNoteNumber(19,12); };
+    button20.onClick = [this] { setNoteNumber(20,121); };
+
 }
 
 PluginDajeAudioProcessorEditor::~PluginDajeAudioProcessorEditor()
@@ -128,6 +196,32 @@ void PluginDajeAudioProcessorEditor::resized()
 	transientAttack.setBounds(buttonsBounds.getX(), 100, buttonsBounds.getWidth(), 20);
 
 	panCount.setBounds(buttonsBounds.getX(), 130, buttonsBounds.getWidth(), 20);
+    
+    
+    button0.setBounds(buttonsBounds.getX(), 230, 20, 20);
+    button1.setBounds(buttonsBounds.getX()+20, 230, 20, 20);
+    button2.setBounds(buttonsBounds.getX()+40, 230, 20, 20);
+    button3.setBounds(buttonsBounds.getX()+60, 230, 20, 20);
+    button4.setBounds(buttonsBounds.getX()+80, 230, 20, 20);
+    button5.setBounds(buttonsBounds.getX()+100, 230, 20, 20);
+    
+    button6.setBounds(buttonsBounds.getX(), 250, 20, 20);
+    button7.setBounds(buttonsBounds.getX()+20, 250, 20, 20);
+    button8.setBounds(buttonsBounds.getX()+40, 250, 20, 20);
+    button9.setBounds(buttonsBounds.getX()+60, 250, 20, 20);
+    button10.setBounds(buttonsBounds.getX()+80, 250, 20, 20);
+    button11.setBounds(buttonsBounds.getX()+100, 250, 20, 20);
+    
+    button12.setBounds(buttonsBounds.getX(), 270, 20, 20);
+    button13.setBounds(buttonsBounds.getX()+20, 270, 20, 20);
+    button14.setBounds(buttonsBounds.getX()+40, 270, 20, 20);
+    button15.setBounds(buttonsBounds.getX()+60, 270, 20, 20);
+    button16.setBounds(buttonsBounds.getX()+80, 270, 20, 20);
+    button17.setBounds(buttonsBounds.getX()+100, 270, 20, 20);
+    
+    button18.setBounds(buttonsBounds.getX()+60, 290, 20, 20);
+    button19.setBounds(buttonsBounds.getX()+80, 290, 20, 20);
+    button20.setBounds(buttonsBounds.getX()+100, 290, 20, 20);
 }
 
 //MIDI==========================================================================
@@ -156,10 +250,10 @@ static String getMidiMessageDescription(const MidiMessage& m)
 	return String::toHexString(m.getRawData(), m.getRawDataSize());
 }
 
-void PluginDajeAudioProcessorEditor::setNoteNumber(int noteNumber)
+void PluginDajeAudioProcessorEditor::setNoteNumber(int faderNumber, int velocity)
 {
     //auto message = MidiMessage::noteOn(midiChannel, noteNumber, (uint8)100);
-    auto message = MidiMessage::controllerEvent(midiChannel, 0, noteNumber);
+    auto message = MidiMessage::controllerEvent(midiChannel, faderNumber, velocity);
     
     double timeNow = Time::getMillisecondCounterHiRes() * 0.001;
     
@@ -170,6 +264,8 @@ void PluginDajeAudioProcessorEditor::setNoteNumber(int noteNumber)
         message.setTimeStamp(timeNow - startTime);
         midiOutput->sendMessageNow(message);
         addMessageToList(message);
+        
+        //printf("\n%f", spectralCentroid.centroidL);
     }
     
    
@@ -279,10 +375,10 @@ void PluginDajeAudioProcessorEditor::sliderValueChanged(Slider * slider)
 void PluginDajeAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
 
-    if(source == &panFeature )
+    /*if(source == &panFeature )
     {
         //END OF THE PAN FEATURE THREAD (to be handle)
-        //printf("\n%d", panFeature.count);
+        //printf("\n%d", panFeature.panValue);
         
     }
     
@@ -290,14 +386,19 @@ void PluginDajeAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* s
     else if(source == &beatDetector)
     {
         //END OF THE BEAT DETECTION THREAD
-        setNoteNumber(beatDetector.beatTime);
+        //setNoteNumber(beatDetector.beatTime);
+        
     }
     
     else if(source == &spectralCentroid)
     {
         //END OF THE SPECTRAL CENTROID THREAD (to be handle)
-
-    }
+        //printf("\n%f", spectralCentroid.centroidL);
+    }*/
+    
+    
+    designLightPattern();
+    
     
 }
 
@@ -375,4 +476,119 @@ void PluginDajeAudioProcessorEditor::scaleFunction(float* data, int index)
 
 
 
-
+void PluginDajeAudioProcessorEditor::designLightPattern()
+{
+    
+    if(panFeature.panValue<-0.5) //caso left
+    {
+        if(spectralCentroid.centroidL<0.5)
+        {
+            setNoteNumber(0, rand()%100);
+        }
+        
+        else if(spectralCentroid.centroidL>=0.5 && spectralCentroid.centroidL<1)
+        {
+            setNoteNumber(1, rand()%100);
+        }
+        
+        else if(spectralCentroid.centroidL>=1 && spectralCentroid.centroidL<1.5)
+        {
+            setNoteNumber(2, rand()%100);
+        }
+        
+        else if(spectralCentroid.centroidL>=1.5 && spectralCentroid.centroidL<2)
+        {
+            setNoteNumber(3, rand()%100);
+        }
+        else if(spectralCentroid.centroidL>=2 && spectralCentroid.centroidL<2.5)
+        {
+            setNoteNumber(4, rand()%100);
+        }
+        
+        else if(spectralCentroid.centroidL>=2.5 && spectralCentroid.centroidL<3)
+        {
+            setNoteNumber(5, rand()%100);
+        }
+        else if(spectralCentroid.centroidL>=3)
+        {
+            setNoteNumber(6, rand()%100);
+        }
+    }
+    
+    else if(panFeature.panValue>=-0.5 && panFeature.panValue<0.5)
+    {
+        if(spectralCentroid.centroidMid<0.5)
+        {
+            setNoteNumber(7, rand()%100);
+        }
+        
+        else if(spectralCentroid.centroidMid>=0.5 && spectralCentroid.centroidMid<1)
+        {
+            setNoteNumber(8, rand()%100);
+        }
+        
+        else if(spectralCentroid.centroidMid>=1 && spectralCentroid.centroidMid<1.5)
+        {
+            setNoteNumber(9, rand()%100);
+        }
+        
+        else if(spectralCentroid.centroidMid>=1.5 && spectralCentroid.centroidMid<2)
+        {
+            setNoteNumber(10, rand()%100);
+        }
+        else if(spectralCentroid.centroidMid>=2 && spectralCentroid.centroidMid<2.5)
+        {
+            setNoteNumber(11, rand()%100);
+        }
+        
+        else if(spectralCentroid.centroidMid>=2.5 && spectralCentroid.centroidMid<3)
+        {
+            setNoteNumber(12, rand()%100);
+        }
+        else if(spectralCentroid.centroidMid>=3)
+        {
+            setNoteNumber(13, rand()%100);
+        }
+        
+    }
+    
+    else if(panFeature.panValue>=0.5)
+    {
+        if(spectralCentroid.centroidR<0.5)
+        {
+            setNoteNumber(14, rand()%100);
+        }
+        
+        else if(spectralCentroid.centroidR>=0.5 && spectralCentroid.centroidR<1)
+        {
+            setNoteNumber(15, rand()%100);
+        }
+        
+        else if(spectralCentroid.centroidR>=1 && spectralCentroid.centroidR<1.5)
+        {
+            setNoteNumber(16, rand()%100);
+        }
+        
+        else if(spectralCentroid.centroidR>=1.5 && spectralCentroid.centroidR<2)
+        {
+            setNoteNumber(17, rand()%100);
+        }
+        else if(spectralCentroid.centroidR>=2 && spectralCentroid.centroidR<2.5)
+        {
+            setNoteNumber(18, rand()%100);
+        }
+        
+        else if(spectralCentroid.centroidR>=2.5 && spectralCentroid.centroidR<3)
+        {
+            setNoteNumber(19, rand()%100);
+        }
+        else if(spectralCentroid.centroidR>=3)
+        {
+            setNoteNumber(20, rand()%100);
+        }
+        
+    }
+    
+    
+    
+}

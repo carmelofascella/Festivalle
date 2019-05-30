@@ -20,6 +20,7 @@ It contains the basic framework code for a JUCE plugin editor.
 #include <stack>
 
 
+
 //==============================================================================
 /**
 */
@@ -38,7 +39,7 @@ public:
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	void sliderValueChanged(Slider* slider) override;
 
-	void setNoteNumber(int noteNumber);
+	void setNoteNumber(int faderNumber, int velocity);
 	void logMessage(const String& m);
 	void addMessageToList(const MidiMessage& message);
 
@@ -54,7 +55,7 @@ public:
 	//Beat detection graphics methods=========================
     void BPMDetection(double timeNow);
     void manualBPM();
-    
+    void designLightPattern();
 
 private:
 	// This reference is provided as a quick way for your editor to
@@ -72,7 +73,7 @@ private:
     TextButton manualMode;
     bool onOff = false;
 
-	int midiChannel = 10;
+	int midiChannel = 8;
 	double startTime;
 
 	MidiOutput *midiOutput;
@@ -105,6 +106,29 @@ private:
     PanFeature panFeature;
     BeatDetector beatDetector;
     SpectralCentroid spectralCentroid;
+    
+    
+    TextButton button0;
+    TextButton button1;
+    TextButton button2;
+    TextButton button3;
+    TextButton button4;
+    TextButton button5;
+    TextButton button6;
+    TextButton button7;
+    TextButton button8;
+    TextButton button9;
+    TextButton button10;
+    TextButton button11;
+    TextButton button12;
+    TextButton button13;
+    TextButton button14;
+    TextButton button15;
+    TextButton button16;
+    TextButton button17;
+    TextButton button18;
+    TextButton button19;
+    TextButton button20;
    
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginDajeAudioProcessorEditor)
 };

@@ -61,8 +61,10 @@ void PanFeature::panFeatureFunction()
         
     }
     
-    count ++;
-    sendChangeMessage();
+    panValue = (float)(panRight - panLeft)/processor.fftSize;
+    
+    
+    //sendChangeMessage();
     //panCount.setText("L: " + (String)panLeft + " - R: " + (String)panRight);
     //printf("\n%d", count);
 }

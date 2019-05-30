@@ -68,6 +68,8 @@ private:
     int kickmax = 0;
     int snaremin = 0;
     int snaremax = 0;
+    int bandKick=0;
+    int bandSnare=0;
     
     bool beforeTransient = false;
     bool transient = false;

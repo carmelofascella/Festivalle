@@ -164,20 +164,7 @@ void PluginDajeAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuff
            
             
             
-            
-			
-			//prova = round((channelData[sample]*127));
-			////
-			//    if (channelData[sample] > threshold) {
-			//    sendChangeMessage();
-			//}
-			// count++;
-			//if (count > getSampleRate()) {
-            //    //printf("ZZ: %d\n", count);
-            //    printf("%d\n", buffer.getNumSamples());
-			////sendChangeMessage();
-			//count = 0;
-			// }
+      
 
 
 

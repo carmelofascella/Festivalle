@@ -20,6 +20,8 @@ BeatDetector::BeatDetector (PluginDajeAudioProcessor& p)
     kickmax = round(130 / dim);
     snaremin = round(301 / dim);
     snaremax = round(750 / dim);
+    bandKick=(kickmax - kickmin) * 2;
+    bandSnare=(snaremax-snaremin) * 2;
 
 }
 
@@ -127,7 +129,6 @@ float BeatDetector::averageQueue(std::queue<std::vector<float>> temporalQueue, i
     
 }
 
-
 //considero i sample del low-mid range, che vanno dall' 8° al 18° sample del fftData (sono 11 sample)
 float BeatDetector::performEnergyFFT(int index){
     
@@ -138,14 +139,14 @@ float BeatDetector::performEnergyFFT(int index){
         for (int i = kickmin; i <= kickmax; i++) {  //KICK
             sum = sum + processor.fftDataL[i] + processor.fftDataR[i];
         }
-        sum = sum / ((kickmax - kickmin) * 2); //numero canali;
+        sum = sum / bandKick; //numero canali;
     }
     else if(index == 1)
     {
         for (int i = snaremin; i <= snaremax; i++) {  //SNARE   //OCCHIOOOOOO
             sum = sum + processor.fftDataL[i] + processor.fftDataR[i];
         }
-        sum = sum / ((snaremax-snaremin) * 2); //numero canali;
+        sum = sum / bandSnare; //numero canali;
     }
     return sum;
 }

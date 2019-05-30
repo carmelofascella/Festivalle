@@ -48,7 +48,7 @@ void PanFeature::panFeatureFunction()
     
     int panLeft = 0, panRight = 0;
     
-    for (int i = 0; i < processor.fftSize; i++)
+    for (int i = 0; i < processor.fftSize / 2; i++)
     {
         if (processor.fftDataL[i] - processor.fftDataR[i] > 0)
         {
@@ -61,7 +61,7 @@ void PanFeature::panFeatureFunction()
         
     }
     
-    panValue = (float)(panRight - panLeft)/processor.fftSize;
+    panValue = (float)(panRight - panLeft)/ (PluginDajeAudioProcessor::fftSize / 2);
     
     
     //sendChangeMessage();

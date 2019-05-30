@@ -96,8 +96,8 @@ private:
     
     double timeAverage = 0; //manual mode
 
-    float minAbs=0;
-    float maxAbs=0;
+    float minAbs = 10000; //per assegnarli con sicurezza al primo ciclo
+    float maxAbs = -10000;
 
     bool beforeTransient = false;
     bool transient = false;

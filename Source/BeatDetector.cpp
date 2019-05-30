@@ -124,7 +124,7 @@ float BeatDetector::averageQueue(std::queue<std::vector<float>> temporalQueue, i
     }
     
     
-    return sum/dim;
+    return sum / dim;
     
     
 }

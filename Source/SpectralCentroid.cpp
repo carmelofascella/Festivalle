@@ -18,8 +18,8 @@ SpectralCentroid::SpectralCentroid(PluginDajeAudioProcessor& p)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
+	centersGrativtyFunction();
  
-    centersGrativtyFunction();
 }
 
 SpectralCentroid::~SpectralCentroid()
@@ -38,41 +38,47 @@ void SpectralCentroid::resized()
 
 void SpectralCentroid::run()
 {
-    
+
     spectralCentroidFunction();
     
 }
 
 void SpectralCentroid::spectralCentroidFunction()
 {
-    float numL=0;
-    float numR=0;
-    float denL=0;
-    float denR=0;
+    float numL = 0;
+    float numR = 0;
+    float denL = 0;
+    float denR = 0;
     
     powerSpectrumFunction();
     
 
-    for(int i=0;i<PluginDajeAudioProcessor::fftSize;i++)
+    for(int i = 0; i <= PluginDajeAudioProcessor::fftSize / 2 - 1; i++)
     {
-        numL +=  log2(centersFreq[i]/ 1000 ) * powerSpectrumL[i+1];
-        numR +=  log2(centersFreq[i]/ 1000 ) * powerSpectrumR[i+1];
+        numL +=  log2(centersFreq[i] / 1000 ) * powerSpectrumL[i + 1];
+        numR +=  log2(centersFreq[i] / 1000 ) * powerSpectrumR[i + 1];
         
-        
-        
-        denL += powerSpectrumL[i+1];
-        denR += powerSpectrumR[i+1];
+        denL += powerSpectrumL[i + 1];
+        denR += powerSpectrumR[i + 1];
     }
     
-    centroidL = numL / denL;
-    centroidR = numR / denR;
-    centroidMid = (centroidL + centroidR)/2;
+	if (denL == 0)
+		centroidL = 0;
+	else
+		centroidL = numL / denL;
+
+	if (denR == 0)
+		centroidR = 0;
+	else
+		centroidR = numR / denR;
+
+	centroidMid = (centroidL + centroidR) / 2;
     
-    printf("\ndiff: %.5f", numL-numR);
+    printf("\ndiff: %.5f", numL - numR);
     
     
     
-    //printf("\nleft:%.3f   mid:%.3f   right: %.3f", centroidL,centroidMid,centroidR);
+    //printf("\nleft:%.3f   mid:%.3f   right: %.3f", centroidL, centroidMid, centroidR);
     //sendChangeMessage();
     
     
@@ -82,7 +88,7 @@ void SpectralCentroid::spectralCentroidFunction()
 void SpectralCentroid::powerSpectrumFunction()
 {
     //printf("\n");
-    for(int i=0; i<PluginDajeAudioProcessor::fftSize;i++)
+    for(int i = 0; i < PluginDajeAudioProcessor::fftSize; i++)
     {
         powerSpectrumL[i] = processor.fftDataL[i] * processor.fftDataL[i];
         powerSpectrumR[i] = processor.fftDataR[i] * processor.fftDataR[i];
@@ -91,7 +97,7 @@ void SpectralCentroid::powerSpectrumFunction()
 
     }
     
-    //modify the spectrum, it starts from 1, the value i=0 is discarded
+    //modify the spectrum, it starts from 1, the value i = 0 is discarded
     powerSpectrumL[1] = powerSpectrumL[0] + powerSpectrumL[1];
     powerSpectrumR[1] = powerSpectrumR[0] + powerSpectrumR[1];
     //printf("\n");
@@ -100,11 +106,11 @@ void SpectralCentroid::powerSpectrumFunction()
 
 void SpectralCentroid::centersGrativtyFunction()
 {
-    centersFreq[0] = rangeFreq;
+	centersFreq[0] = rangeFreq;
 
-    for(int i=1; i<PluginDajeAudioProcessor::fftSize; i++)
+    for(int i = 1; i < PluginDajeAudioProcessor::fftSize; i++)
     {
-        centersFreq[i] = rangeFreq*(i+1);
+        centersFreq[i] = rangeFreq * (i + 1);
     }
 }
 

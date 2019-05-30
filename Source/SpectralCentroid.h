@@ -32,9 +32,9 @@ public:
 
     void centersGrativtyFunction();
     
-    float centroidL=0;
-    float centroidR=0;
-    float centroidMid=0;
+    float centroidL = 0;
+    float centroidR = 0;
+    float centroidMid = 0;
     
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectralCentroid)
@@ -46,6 +46,6 @@ private:
     float centersFreq[PluginDajeAudioProcessor::fftSize];
 
     
-    int rangeFreq = round(processor.getSampleRate() / processor.fftSize);
+	int rangeFreq = round(processor.getSampleRate() / PluginDajeAudioProcessor::fftSize);
     
 };

@@ -41,7 +41,7 @@ public:
     float varianceEnergyHistory(float average, std::queue<std::vector<float>> tempQueue, int index);
     //=============================
     
-    int beatTime=0;
+    int beatTime = 0;
     
     
 private:
@@ -49,7 +49,7 @@ private:
     
     PluginDajeAudioProcessor& processor;
     
-    int dim = round(processor.getSampleRate() / processor.fftSize);
+    int dim = round(processor.getSampleRate() / PluginDajeAudioProcessor::fftSize);
     
     
     int oldCount=0;
@@ -68,8 +68,8 @@ private:
     int kickmax = 0;
     int snaremin = 0;
     int snaremax = 0;
-    int bandKick=0;
-    int bandSnare=0;
+    int bandKick = 0;
+    int bandSnare = 0;
     
     bool beforeTransient = false;
     bool transient = false;

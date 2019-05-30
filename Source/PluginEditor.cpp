@@ -297,7 +297,7 @@ void PluginDajeAudioProcessorEditor::BPMDetection(double timeNow)
 		if (numBeat >= numBeatSize)
 		{
 			double av = BPMsum / (numBeatSize);
-			double var = BPMsumq / (numBeatSize)-(av * av);
+			double var = BPMsumq / (numBeatSize) - (av * av);
 			//double var = BPMsumq / (numBeatSize-1) + (av * av * numBeatSize) / (numBeatSize - 1) - (2 * av * BPMsum) / (numBeatSize - 1);
 
 			if (var < varianceBeat)
@@ -382,7 +382,6 @@ void PluginDajeAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* s
         
     }
     
-    
     else if(source == &beatDetector)
     {
         //END OF THE BEAT DETECTION THREAD
@@ -394,6 +393,7 @@ void PluginDajeAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* s
     {
         //END OF THE SPECTRAL CENTROID THREAD (to be handle)
         //printf("\n%f", spectralCentroid.centroidL);
+
     }*/
     
     
@@ -445,15 +445,13 @@ void PluginDajeAudioProcessorEditor::timerCallback()
 void PluginDajeAudioProcessorEditor::findRangeValueFunction(float* data, int index)
 {
     //float* data = processor.getFFTData();
-    
-    for(int i=1; i < PluginDajeAudioProcessor::fftSize; i++){
-        if(data[i]>maxAbs)
+
+    for(int i = 0; i < PluginDajeAudioProcessor::fftSize / 2; i++) {
+        if(data[i] > maxAbs)
             maxAbs = data[i];
-        if(data[i]<minAbs)
+        if(data[i] < minAbs)
             minAbs = data[i];
     }
-    
-    
     
     scaleFunction(data, index);
    
@@ -461,12 +459,12 @@ void PluginDajeAudioProcessorEditor::findRangeValueFunction(float* data, int ind
 
 void PluginDajeAudioProcessorEditor::scaleFunction(float* data, int index)
 {
-    if(index == 0)
+    if(index == 0 && maxAbs - minAbs != 0)
 		for(int i=0; i < PluginDajeAudioProcessor::fftSize; i++){
 			//processor.getFFTData()[i] =  ((data[i]-min) * (1-(-1))) / ((max-min)+(-1))  ;
-			processor.fftDataL[i] = 1 *((data[i] - minAbs)/(maxAbs - minAbs)) -0;
+			processor.fftDataL[i] = 1 *((data[i] - minAbs) / (maxAbs - minAbs)) - 0;
 		}
-	else
+	else if(index == 1 && maxAbs - minAbs != 0)
 		for (int i = 0; i < PluginDajeAudioProcessor::fftSize; i++) {
 			//processor.getFFTData()[i] =  ((data[i]-min) * (1-(-1))) / ((max-min)+(-1))  ;
 			processor.fftDataR[i] = 1 * ((data[i] - minAbs) / (maxAbs - minAbs)) - 0;
@@ -481,7 +479,7 @@ void PluginDajeAudioProcessorEditor::designLightPattern()
     
     if(panFeature.panValue<-0.5) //caso left
     {
-        if(spectralCentroid.centroidL<0.5)
+        if(spectralCentroid.centroidL < 0.5)
         {
             setNoteNumber(0, rand()%100);
         }
@@ -589,6 +587,7 @@ void PluginDajeAudioProcessorEditor::designLightPattern()
         
     }
     
-    
+	//panCount.setText("R - L: " + (String)panFeature.panValue);
+	panCount.setText("L:" + (String)spectralCentroid.centroidL + " - R: " + (String)spectralCentroid.centroidR);
     
 }

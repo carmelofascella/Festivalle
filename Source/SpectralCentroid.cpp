@@ -74,7 +74,34 @@ void SpectralCentroid::spectralCentroidFunction()
 
 	centroidMid = (centroidL + centroidR) / 2;
     
-    printf("\ndiff: %.5f", numL - numR);
+    //printf("\ndiff: %.5f", numL - numR);
+    
+    /*
+    if(centroidL > maxL)
+    {
+        maxL = centroidL;
+        printf("\n maxL = %.3f", maxL );
+    }
+    
+    if(centroidR > maxR)
+    {
+        maxR = centroidR;
+        printf("\n maxR = %.3f", maxR );
+    }
+    
+    
+    if(centroidL < minL)
+    {
+        minL = centroidL;
+        printf("\n minL = %.3f", minL );
+    }
+    
+    if(centroidR < minR)
+    {
+        minR = centroidR;
+        printf("\n minR = %.3f", minR );
+    }
+    */
     
     
     

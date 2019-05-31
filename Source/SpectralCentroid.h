@@ -48,4 +48,10 @@ private:
     
 	int rangeFreq = round(processor.getSampleRate() / PluginDajeAudioProcessor::fftSize);
     
+    float maxL=0;
+    float maxR=0;
+    
+    float minL=0;
+    float minR=0;
+    
 };

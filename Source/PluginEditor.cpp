@@ -479,35 +479,35 @@ void PluginDajeAudioProcessorEditor::designLightPattern()
     
     if(panFeature.panValue<-0.5) //caso left
     {
-        if(spectralCentroid.centroidL < 0.5)
+        if(spectralCentroid.centroidL < -3.5)
         {
             setNoteNumber(0, rand()%100);
         }
         
-        else if(spectralCentroid.centroidL>=0.5 && spectralCentroid.centroidL<1)
+        else if(spectralCentroid.centroidL>=-3.5 && spectralCentroid.centroidL<-2.5)
         {
             setNoteNumber(1, rand()%100);
         }
         
-        else if(spectralCentroid.centroidL>=1 && spectralCentroid.centroidL<1.5)
+        else if(spectralCentroid.centroidL>=-2.5 && spectralCentroid.centroidL<-1.5)
         {
             setNoteNumber(2, rand()%100);
         }
         
-        else if(spectralCentroid.centroidL>=1.5 && spectralCentroid.centroidL<2)
+        else if(spectralCentroid.centroidL>=-1.5 && spectralCentroid.centroidL<-0.5)
         {
             setNoteNumber(3, rand()%100);
         }
-        else if(spectralCentroid.centroidL>=2 && spectralCentroid.centroidL<2.5)
+        else if(spectralCentroid.centroidL>=-0.5 && spectralCentroid.centroidL<0.5)
         {
             setNoteNumber(4, rand()%100);
         }
         
-        else if(spectralCentroid.centroidL>=2.5 && spectralCentroid.centroidL<3)
+        else if(spectralCentroid.centroidL>=0.5 && spectralCentroid.centroidL<1.5)
         {
             setNoteNumber(5, rand()%100);
         }
-        else if(spectralCentroid.centroidL>=3)
+        else if(spectralCentroid.centroidL>1.5)
         {
             setNoteNumber(6, rand()%100);
         }
@@ -515,35 +515,35 @@ void PluginDajeAudioProcessorEditor::designLightPattern()
     
     else if(panFeature.panValue>=-0.5 && panFeature.panValue<0.5)
     {
-        if(spectralCentroid.centroidMid<0.5)
+        if(spectralCentroid.centroidMid<-3.5)
         {
             setNoteNumber(7, rand()%100);
         }
         
-        else if(spectralCentroid.centroidMid>=0.5 && spectralCentroid.centroidMid<1)
+        else if(spectralCentroid.centroidMid>=-3.5 && spectralCentroid.centroidMid<-2.5)
         {
             setNoteNumber(8, rand()%100);
         }
         
-        else if(spectralCentroid.centroidMid>=1 && spectralCentroid.centroidMid<1.5)
+        else if(spectralCentroid.centroidMid>=-2.5 && spectralCentroid.centroidMid<-1.5)
         {
             setNoteNumber(9, rand()%100);
         }
         
-        else if(spectralCentroid.centroidMid>=1.5 && spectralCentroid.centroidMid<2)
+        else if(spectralCentroid.centroidMid>=-1.5 && spectralCentroid.centroidMid<-0.5)
         {
             setNoteNumber(10, rand()%100);
         }
-        else if(spectralCentroid.centroidMid>=2 && spectralCentroid.centroidMid<2.5)
+        else if(spectralCentroid.centroidMid>=-0.5 && spectralCentroid.centroidMid<0.5)
         {
             setNoteNumber(11, rand()%100);
         }
         
-        else if(spectralCentroid.centroidMid>=2.5 && spectralCentroid.centroidMid<3)
+        else if(spectralCentroid.centroidMid>=0.5 && spectralCentroid.centroidMid<1.5)
         {
             setNoteNumber(12, rand()%100);
         }
-        else if(spectralCentroid.centroidMid>=3)
+        else if(spectralCentroid.centroidMid>=1.5)
         {
             setNoteNumber(13, rand()%100);
         }
@@ -552,35 +552,35 @@ void PluginDajeAudioProcessorEditor::designLightPattern()
     
     else if(panFeature.panValue>=0.5)
     {
-        if(spectralCentroid.centroidR<0.5)
+        if(spectralCentroid.centroidR<-3.5)
         {
             setNoteNumber(14, rand()%100);
         }
         
-        else if(spectralCentroid.centroidR>=0.5 && spectralCentroid.centroidR<1)
+        else if(spectralCentroid.centroidR>=-3.5 && spectralCentroid.centroidR<-2.5)
         {
             setNoteNumber(15, rand()%100);
         }
         
-        else if(spectralCentroid.centroidR>=1 && spectralCentroid.centroidR<1.5)
+        else if(spectralCentroid.centroidR>=-2.5 && spectralCentroid.centroidR<-1.5)
         {
             setNoteNumber(16, rand()%100);
         }
         
-        else if(spectralCentroid.centroidR>=1.5 && spectralCentroid.centroidR<2)
+        else if(spectralCentroid.centroidR>=-1.5 && spectralCentroid.centroidR<-0.5)
         {
             setNoteNumber(17, rand()%100);
         }
-        else if(spectralCentroid.centroidR>=2 && spectralCentroid.centroidR<2.5)
+        else if(spectralCentroid.centroidR>=-0.5 && spectralCentroid.centroidR<0.5)
         {
             setNoteNumber(18, rand()%100);
         }
         
-        else if(spectralCentroid.centroidR>=2.5 && spectralCentroid.centroidR<3)
+        else if(spectralCentroid.centroidR>=0.5 && spectralCentroid.centroidR<1.5)
         {
             setNoteNumber(19, rand()%100);
         }
-        else if(spectralCentroid.centroidR>=3)
+        else if(spectralCentroid.centroidR>=1.5)
         {
             setNoteNumber(20, rand()%100);
         }

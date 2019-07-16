@@ -52,7 +52,7 @@ void SpectralCentroid::spectralCentroidFunction()
     
     powerSpectrumFunction();
     
-
+    
     for(int i = 0; i <= PluginDajeAudioProcessor::fftSize / 2 - 1; i++)
     {
         numL +=  log2(centersFreq[i] / 1000 ) * powerSpectrumL[i + 1];
@@ -62,46 +62,19 @@ void SpectralCentroid::spectralCentroidFunction()
         denR += powerSpectrumR[i + 1];
     }
     
-	if (denL == 0)
-		centroidL = 0;
-	else
-		centroidL = numL / denL;
-
-	if (denR == 0)
-		centroidR = 0;
-	else
-		centroidR = numR / denR;
-
-	centroidMid = (centroidL + centroidR) / 2;
+    if (denL < pow(10, -25))
+        centroidL = 0;
+    else
+        centroidL = numL / denL;
     
-    //printf("\ndiff: %.5f", numL - numR);
+    if (denR < pow(10, -25))
+        centroidR = 0;
+    else
+        centroidR = numR / denR;
     
-    /*
-    if(centroidL > maxL)
-    {
-        maxL = centroidL;
-        printf("\n maxL = %.3f", maxL );
-    }
+    centroidMid = (centroidL + centroidR) / 2;
     
-    if(centroidR > maxR)
-    {
-        maxR = centroidR;
-        printf("\n maxR = %.3f", maxR );
-    }
-    
-    
-    if(centroidL < minL)
-    {
-        minL = centroidL;
-        printf("\n minL = %.3f", minL );
-    }
-    
-    if(centroidR < minR)
-    {
-        minR = centroidR;
-        printf("\n minR = %.3f", minR );
-    }
-    */
+    printf("\ndiff: %.5f", numL - numR);
     
     
     

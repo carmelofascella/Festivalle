@@ -68,10 +68,13 @@ private:
 	TextEditor minimumVar;
 	TextEditor transientAttack;
 	TextEditor panCount;
+	TextEditor spectralCount;
 
     TextButton tapTempo;
     TextButton manualMode;
     bool onOff = false;
+
+	TextButton resetVarianceBeat;
 
 	int midiChannel = 8;
 	double startTime;

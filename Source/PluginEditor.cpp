@@ -34,6 +34,11 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 	panCount.setText("panCount: calculate...");
 	panCount.setReadOnly(true);
 
+	addAndMakeVisible(spectralCount);
+	spectralCount.setText("spectralCount: calculate...");
+	spectralCount.setReadOnly(true);
+
+
 	addAndMakeVisible(actualBPM);
 	actualBPM.setText("BPM: calculate...");
 	actualBPM.setReadOnly(true);
@@ -41,6 +46,11 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
     addAndMakeVisible(tapTempo);
     tapTempo.setButtonText("Tap Tempo");
     tapTempo.onClick = [this] { if(onOff) manualBPM(); };
+
+	addAndMakeVisible(resetVarianceBeat);
+	resetVarianceBeat.setButtonText("BPM Recalculate");
+	resetVarianceBeat.onClick = [this] { varianceBeat = 50; };
+
     
     addAndMakeVisible(manualMode);
     manualMode.setButtonText("Manual Mode: off");
@@ -185,9 +195,11 @@ void PluginDajeAudioProcessorEditor::resized()
 
 	midiMessagesBox.setBounds(getLocalBounds().withWidth(halfWidth).withX(halfWidth).reduced(10));
     
-    tapTempo.setBounds(buttonsBounds.getX(), 170, buttonsBounds.getWidth(), 20);
+    tapTempo.setBounds(buttonsBounds.getX(), 200, buttonsBounds.getWidth(), 20);
     
-    manualMode.setBounds(buttonsBounds.getX(), 200, buttonsBounds.getWidth(), 20);
+    manualMode.setBounds(buttonsBounds.getX(), 230, buttonsBounds.getWidth(), 20);
+
+	resetVarianceBeat.setBounds(buttonsBounds.getX(), 260, buttonsBounds.getWidth(), 20);
 	
 	actualVar.setBounds(buttonsBounds.getX(), 40, buttonsBounds.getWidth(), 20);
 
@@ -196,7 +208,8 @@ void PluginDajeAudioProcessorEditor::resized()
 	transientAttack.setBounds(buttonsBounds.getX(), 100, buttonsBounds.getWidth(), 20);
 
 	panCount.setBounds(buttonsBounds.getX(), 130, buttonsBounds.getWidth(), 20);
-    
+
+	spectralCount.setBounds(buttonsBounds.getX(), 160, buttonsBounds.getWidth(), 20);
     
     button0.setBounds(buttonsBounds.getX(), 230, 20, 20);
     button1.setBounds(buttonsBounds.getX()+20, 230, 20, 20);
@@ -587,7 +600,6 @@ void PluginDajeAudioProcessorEditor::designLightPattern()
         
     }
     
-	//panCount.setText("R - L: " + (String)panFeature.panValue);
-	panCount.setText("L:" + (String)spectralCentroid.centroidL + " - R: " + (String)spectralCentroid.centroidR);
-    
+	panCount.setText("Panning: " + (String)panFeature.panValue);
+	spectralCount.setText("SpectralCentroidMid: " + (String)spectralCentroid.centroidMid);
 }

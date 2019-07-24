@@ -41,8 +41,11 @@ public:
     float varianceEnergyHistory(float average, std::queue<std::vector<float>> tempQueue, int index);
     //=============================
     
-    int beatTime = 0;
-    
+    int beatTime = 0; 
+
+	bool beforeTransient = false;
+	bool transient = false;
+	double transientStartTime = 0;
     
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BeatDetector)
@@ -70,10 +73,5 @@ private:
     int snaremax = 0;
     int bandKick = 0;
     int bandSnare = 0;
-    
-    bool beforeTransient = false;
-    bool transient = false;
-    double transientStartTime = 0;
-    
     
 };

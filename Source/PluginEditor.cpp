@@ -38,6 +38,9 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 	spectralCount.setText("spectralCount: calculate...");
 	spectralCount.setReadOnly(true);
 
+	addAndMakeVisible(velocityMessage);
+	velocityMessage.setText("velocityMessage: calculate...");
+	velocityMessage.setReadOnly(true);
 
 	addAndMakeVisible(actualBPM);
 	actualBPM.setText("BPM: calculate...");
@@ -60,8 +63,8 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
             numBeat = 0;
             timeAverage = 0;
             manualMode.setButtonText("Manual Mode: on");
-			beforeTransient = false;
-			transient = false;
+			beatDetector.beforeTransient = false;
+			beatDetector.transient = false;
 			transientAttack.setText("transientAttack: off");
         }
         else {
@@ -195,11 +198,11 @@ void PluginDajeAudioProcessorEditor::resized()
 
 	midiMessagesBox.setBounds(getLocalBounds().withWidth(halfWidth).withX(halfWidth).reduced(10));
     
-    tapTempo.setBounds(buttonsBounds.getX(), 200, buttonsBounds.getWidth(), 20);
+    tapTempo.setBounds(buttonsBounds.getX(), 230, buttonsBounds.getWidth(), 20);
     
-    manualMode.setBounds(buttonsBounds.getX(), 230, buttonsBounds.getWidth(), 20);
+    manualMode.setBounds(buttonsBounds.getX(), 260, buttonsBounds.getWidth(), 20);
 
-	resetVarianceBeat.setBounds(buttonsBounds.getX(), 260, buttonsBounds.getWidth(), 20);
+	resetVarianceBeat.setBounds(buttonsBounds.getX(), 290, buttonsBounds.getWidth(), 20);
 	
 	actualVar.setBounds(buttonsBounds.getX(), 40, buttonsBounds.getWidth(), 20);
 
@@ -211,6 +214,8 @@ void PluginDajeAudioProcessorEditor::resized()
 
 	spectralCount.setBounds(buttonsBounds.getX(), 160, buttonsBounds.getWidth(), 20);
     
+	velocityMessage.setBounds(buttonsBounds.getX(), 190, buttonsBounds.getWidth(), 20);
+
     button0.setBounds(buttonsBounds.getX(), 230, 20, 20);
     button1.setBounds(buttonsBounds.getX()+20, 230, 20, 20);
     button2.setBounds(buttonsBounds.getX()+40, 230, 20, 20);
@@ -270,27 +275,35 @@ void PluginDajeAudioProcessorEditor::setNoteNumber(int faderNumber, int velocity
     
     double timeNow = Time::getMillisecondCounterHiRes() * 0.001;
     
-    if(timeNow - prevTime - startTime > 0.3)   //200bpm massimi
-    {
+	if (faderNumber == 0) {
+		message.setTimeStamp(timeNow - startTime);
+		midiOutput->sendMessageNow(message);
+		//printf("\n%f", spectralCentroid.centroidL);
+
+		velocityMessage.setText("velocityMessage: " + (String)velocity);
+		//countVelMess++;
+	}
+
+	else if (timeNow - prevTime - startTime > 0.3)   //200bpm massimi
+	{
 		BPMDetection(timeNow);
 		prevTime = timeNow - startTime; //occhio
-        message.setTimeStamp(timeNow - startTime);
-        midiOutput->sendMessageNow(message);
-        addMessageToList(message);
-        
-        //printf("\n%f", spectralCentroid.centroidL);
-    }
-    
+		message.setTimeStamp(timeNow - startTime);
+		midiOutput->sendMessageNow(message);
+		addMessageToList(message);
+		//printf("\n%f", spectralCentroid.centroidL);
+	}
    
 }
 
 void PluginDajeAudioProcessorEditor::BPMDetection(double timeNow) 
 {
-	if (transient)
+	if (beatDetector.transient)
 	{
-		if (timeNow - transientStartTime > 10)
+		transientAttack.setText("transientAttack: on");
+		if (timeNow - beatDetector.transientStartTime > 10)
 		{
-			transient = false;
+			beatDetector.transient = false;
 			transientAttack.setText("transientAttack: off");
 		}
 	}
@@ -408,10 +421,7 @@ void PluginDajeAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* s
         //printf("\n%f", spectralCentroid.centroidL);
 
     }*/
-    
-    
-    designLightPattern();
-    
+	designLightPattern();
     
 }
 
@@ -440,13 +450,38 @@ void PluginDajeAudioProcessorEditor::drawNextLineOfSpectrogram()
     
     spectralCentroid.run();         //START SPECTRAL CENTROID THREAD
     
-    
-    
+
+	//-----F0RSE
+	if (beatDetector.transient) {
+		setNoteNumber(0, 50);
+	}
+	else {
+		float energySum = beatDetector.performEnergyFFT(2);
+		setNoteNumber(0, velocityRange(energySum));
+	}
+}
+
+int PluginDajeAudioProcessorEditor::velocityRange(float energyAmount) {
+	if (energyAmount > maxVelocity/* || countVelMess > 18 * 20*/) //18: numero di messaggi al secondo circa
+		maxVelocity = energyAmount;
+	if (energyAmount < minVelocity/* || countVelMess > 18 * 20*/)
+		minVelocity = energyAmount;
+	//if (countVelMess > 18 * 20) //ogni 20 secondi di musica circa ricalcolo max e min
+		//countVelMess = 0;
+
+	if (maxVelocity - minVelocity != 0)
+		return (int)(127 * ((energyAmount - minVelocity) / (maxVelocity - minVelocity)) - 0);
+	else
+		return 0;
 
 }
 
 void PluginDajeAudioProcessorEditor::timerCallback()
 {
+	if (beatDetector.beforeTransient) {
+		transientAttack.setText("transientAttack: off");
+	}
+
 	if (processor.getNextFFTBlockReady())
 	{
 		drawNextLineOfSpectrogram();
@@ -494,35 +529,35 @@ void PluginDajeAudioProcessorEditor::designLightPattern()
     {
         if(spectralCentroid.centroidL < -3.5)
         {
-            setNoteNumber(0, rand()%100);
+            setNoteNumber(1, rand()%100);
         }
         
         else if(spectralCentroid.centroidL>=-3.5 && spectralCentroid.centroidL<-2.5)
         {
-            setNoteNumber(1, rand()%100);
+            setNoteNumber(2, rand()%100);
         }
         
         else if(spectralCentroid.centroidL>=-2.5 && spectralCentroid.centroidL<-1.5)
         {
-            setNoteNumber(2, rand()%100);
+            setNoteNumber(3, rand()%100);
         }
         
         else if(spectralCentroid.centroidL>=-1.5 && spectralCentroid.centroidL<-0.5)
         {
-            setNoteNumber(3, rand()%100);
+            setNoteNumber(4, rand()%100);
         }
         else if(spectralCentroid.centroidL>=-0.5 && spectralCentroid.centroidL<0.5)
         {
-            setNoteNumber(4, rand()%100);
+            setNoteNumber(5, rand()%100);
         }
         
         else if(spectralCentroid.centroidL>=0.5 && spectralCentroid.centroidL<1.5)
         {
-            setNoteNumber(5, rand()%100);
+            setNoteNumber(6, rand()%100);
         }
         else if(spectralCentroid.centroidL>1.5)
         {
-            setNoteNumber(6, rand()%100);
+            setNoteNumber(7, rand()%100);
         }
     }
     
@@ -530,35 +565,35 @@ void PluginDajeAudioProcessorEditor::designLightPattern()
     {
         if(spectralCentroid.centroidMid<-3.5)
         {
-            setNoteNumber(7, rand()%100);
+            setNoteNumber(8, rand()%100);
         }
         
         else if(spectralCentroid.centroidMid>=-3.5 && spectralCentroid.centroidMid<-2.5)
         {
-            setNoteNumber(8, rand()%100);
+            setNoteNumber(9, rand()%100);
         }
         
         else if(spectralCentroid.centroidMid>=-2.5 && spectralCentroid.centroidMid<-1.5)
         {
-            setNoteNumber(9, rand()%100);
+            setNoteNumber(10, rand()%100);
         }
         
         else if(spectralCentroid.centroidMid>=-1.5 && spectralCentroid.centroidMid<-0.5)
         {
-            setNoteNumber(10, rand()%100);
+            setNoteNumber(11, rand()%100);
         }
         else if(spectralCentroid.centroidMid>=-0.5 && spectralCentroid.centroidMid<0.5)
         {
-            setNoteNumber(11, rand()%100);
+            setNoteNumber(12, rand()%100);
         }
         
         else if(spectralCentroid.centroidMid>=0.5 && spectralCentroid.centroidMid<1.5)
         {
-            setNoteNumber(12, rand()%100);
+            setNoteNumber(13, rand()%100);
         }
         else if(spectralCentroid.centroidMid>=1.5)
         {
-            setNoteNumber(13, rand()%100);
+            setNoteNumber(14, rand()%100);
         }
         
     }
@@ -567,35 +602,35 @@ void PluginDajeAudioProcessorEditor::designLightPattern()
     {
         if(spectralCentroid.centroidR<-3.5)
         {
-            setNoteNumber(14, rand()%100);
+            setNoteNumber(15, rand()%100);
         }
         
         else if(spectralCentroid.centroidR>=-3.5 && spectralCentroid.centroidR<-2.5)
         {
-            setNoteNumber(15, rand()%100);
+            setNoteNumber(16, rand()%100);
         }
         
         else if(spectralCentroid.centroidR>=-2.5 && spectralCentroid.centroidR<-1.5)
         {
-            setNoteNumber(16, rand()%100);
+            setNoteNumber(17, rand()%100);
         }
         
         else if(spectralCentroid.centroidR>=-1.5 && spectralCentroid.centroidR<-0.5)
         {
-            setNoteNumber(17, rand()%100);
+            setNoteNumber(18, rand()%100);
         }
         else if(spectralCentroid.centroidR>=-0.5 && spectralCentroid.centroidR<0.5)
         {
-            setNoteNumber(18, rand()%100);
+            setNoteNumber(19, rand()%100);
         }
         
         else if(spectralCentroid.centroidR>=0.5 && spectralCentroid.centroidR<1.5)
         {
-            setNoteNumber(19, rand()%100);
+            setNoteNumber(20, rand()%100);
         }
         else if(spectralCentroid.centroidR>=1.5)
         {
-            setNoteNumber(20, rand()%100);
+            setNoteNumber(21, rand()%100);
         }
         
     }

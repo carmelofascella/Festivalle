@@ -48,6 +48,8 @@ public:
 
     void findRangeValueFunction(float* fftData, int index);
     void scaleFunction(float* data, int index);
+
+	int velocityRange(float energyAmount);
     
     //void findRangeValueFunction(float *data);
     //void scaleFunction(float min,float max,float* data);
@@ -69,6 +71,9 @@ private:
 	TextEditor transientAttack;
 	TextEditor panCount;
 	TextEditor spectralCount;
+	TextEditor velocityMessage;
+
+	//int countVelMess = 0;
 
     TextButton tapTempo;
     TextButton manualMode;
@@ -101,10 +106,6 @@ private:
 
     float minAbs = 10000; //per assegnarli con sicurezza al primo ciclo
     float maxAbs = -10000;
-
-    bool beforeTransient = false;
-    bool transient = false;
-    double transientStartTime = 0;
     
     PanFeature panFeature;
     BeatDetector beatDetector;
@@ -132,6 +133,9 @@ private:
     TextButton button18;
     TextButton button19;
     TextButton button20;
+
+	float minVelocity = 10000; //per assegnarli con sicurezza al primo ciclo
+	float maxVelocity = -10000;
    
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginDajeAudioProcessorEditor)
 };

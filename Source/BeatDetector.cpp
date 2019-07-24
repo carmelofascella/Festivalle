@@ -47,7 +47,7 @@ void BeatDetector::run()
 
 
 void BeatDetector::beatDetection() {
-    
+
     float energyRange[2];
     
     energyRange[0] = performEnergyFFT(0);   //calcolo energia del range low-mid del singolo buffer
@@ -148,6 +148,11 @@ float BeatDetector::performEnergyFFT(int index){
         }
         sum = sum / bandSnare; //numero canali;
     }
+	else if (index == 2) {
+		for (int i = 0; i < processor.fftSize / 2; i++) {  //SNARE   //OCCHIOOOOOO
+			sum = sum + processor.fftDataL[i] + processor.fftDataR[i];
+		}
+	}
     return sum;
 }
 

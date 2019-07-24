@@ -149,7 +149,10 @@ float BeatDetector::performEnergyFFT(int index){
         sum = sum / bandSnare; //numero canali;
     }
 	else if (index == 2) {
-		for (int i = 0; i < processor.fftSize / 2; i++) {  //SNARE   //OCCHIOOOOOO
+		for (int i = kickmin; i <= kickmax; i++) {  //KICK
+			sum = sum + processor.fftDataL[i] + processor.fftDataR[i];
+		}
+		for (int i = snaremin; i <= snaremax; i++) {  //SNARE   //OCCHIOOOOOO
 			sum = sum + processor.fftDataL[i] + processor.fftDataR[i];
 		}
 	}

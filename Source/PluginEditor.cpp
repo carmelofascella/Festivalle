@@ -39,7 +39,7 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 	spectralCount.setReadOnly(true);
 
 	addAndMakeVisible(velocityMessage);
-	velocityMessage.setText("velocityMessage: calculate...");
+	//velocityMessage.setText("velocityMessage: calculate...");
 	velocityMessage.setReadOnly(true);
 
 	addAndMakeVisible(actualBPM);
@@ -280,7 +280,8 @@ void PluginDajeAudioProcessorEditor::setNoteNumber(int faderNumber, int velocity
 		midiOutput->sendMessageNow(message);
 		//printf("\n%f", spectralCentroid.centroidL);
 
-		velocityMessage.setText("velocityMessage: " + (String)velocity);
+		//velocityMessage.setText((String)maxVelocity);
+		velocityMessage.setBounds(getLocalBounds().withWidth(getWidth() / 2).reduced(10).getX(), 190, ((velocity * getLocalBounds().withWidth(getWidth() / 2).reduced(10).getWidth()) / 127), 20);
 		//countVelMess++;
 	}
 
@@ -304,6 +305,8 @@ void PluginDajeAudioProcessorEditor::BPMDetection(double timeNow)
 		if (timeNow - beatDetector.transientStartTime > 10)
 		{
 			beatDetector.transient = false;
+			maxVelocity = -10000;
+			minVelocity = 10000;
 			transientAttack.setText("transientAttack: off");
 		}
 	}
@@ -452,13 +455,9 @@ void PluginDajeAudioProcessorEditor::drawNextLineOfSpectrogram()
     
 
 	//-----F0RSE
-	if (beatDetector.transient) {
-		setNoteNumber(0, 50);
-	}
-	else {
-		float energySum = beatDetector.performEnergyFFT(2);
-		setNoteNumber(0, velocityRange(energySum));
-	}
+	float energySum = beatDetector.performEnergyFFT(2);
+	setNoteNumber(0, velocityRange(energySum));
+
 }
 
 int PluginDajeAudioProcessorEditor::velocityRange(float energyAmount) {

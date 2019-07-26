@@ -33,39 +33,57 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 	addAndMakeVisible(panCount);
 	panCount.setText("panCount: calculate...");
 	panCount.setReadOnly(true);
+	panCount.setColour(TextEditor::backgroundColourId, Colour(0x32ffffff));
+	panCount.setColour(TextEditor::shadowColourId, Colour(0x16000000));
+
 
 	addAndMakeVisible(spectralCount);
 	spectralCount.setText("spectralCount: calculate...");
 	spectralCount.setReadOnly(true);
+	spectralCount.setColour(TextEditor::backgroundColourId, Colour(0x32ffffff));
+	spectralCount.setColour(TextEditor::shadowColourId, Colour(0x16000000));
+
+	addAndMakeVisible(velocitySubBar);
+	velocitySubBar.setReadOnly(true);
+	velocitySubBar.setColour(TextEditor::backgroundColourId, Colour(0x32ffffff));
+	velocitySubBar.setColour(TextEditor::shadowColourId, Colour(0x16000000));
 
 	addAndMakeVisible(velocityMessage);
 	//velocityMessage.setText("velocityMessage: calculate...");
 	velocityMessage.setReadOnly(true);
+	velocityMessage.setColour(TextEditor::backgroundColourId, Colours::greenyellow);
 
 	addAndMakeVisible(actualBPM);
 	actualBPM.setText("BPM: calculate...");
 	actualBPM.setReadOnly(true);
-    
+	actualBPM.setColour(TextEditor::backgroundColourId, Colour(0x32ffffff));
+	actualBPM.setColour(TextEditor::shadowColourId, Colour(0x16000000));
+
     addAndMakeVisible(tapTempo);
-    tapTempo.setButtonText("Tap Tempo");
+    tapTempo.setButtonText("Tap Tempo"); 
+	tapTempo.setColour(TextButton::buttonColourId, Colour(0x32ffffff));
     tapTempo.onClick = [this] { if(onOff) manualBPM(); };
 
 	addAndMakeVisible(resetVarianceBeat);
 	resetVarianceBeat.setButtonText("BPM Recalculate");
+	resetVarianceBeat.setColour(TextButton::buttonColourId, Colour(0x32ffffff));
 	resetVarianceBeat.onClick = [this] { varianceBeat = 50; };
 
-    
     addAndMakeVisible(manualMode);
-    manualMode.setButtonText("Manual Mode: off");
+    manualMode.setButtonText("Manual Mode");
+	manualMode.setColour(TextButton::buttonColourId, Colour(0x32ffffff));
+	manualMode.setColour(TextButton::buttonOnColourId, Colour(0x32ffffff));
+	manualMode.setColour(TextButton::textColourOnId, Colours::greenyellow);
+	manualMode.setClickingTogglesState(true);
     manualMode.onClick = [this] {
         onOff = !onOff;
         if(onOff) {
             numBeat = 0;
             timeAverage = 0;
-            manualMode.setButtonText("Manual Mode: on");
+            //manualMode.setButtonText("Manual Mode: on");
 			beatDetector.beforeTransient = false;
 			beatDetector.transient = false;
-			transientAttack.setText("transientAttack: off");
+			transientAttack.applyColourToAllText(Colours::white);
         }
         else {
             BPMsum = 0;
@@ -76,7 +94,7 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
             while(!deltaTQueue.empty()) {
                 deltaTQueue.pop();
             }
-            manualMode.setButtonText("Manual Mode: off");
+            //manualMode.setButtonText("Manual Mode: off");
         }
     };
 
@@ -85,10 +103,16 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 	addAndMakeVisible(transientAttack);
 	actualVar.setText("actualVar: calculate...");
 	minimumVar.setText("minimumVar: calculate...");
-	transientAttack.setText("transientAttack: off");
+	transientAttack.setText("transientAttack");
 	actualVar.setReadOnly(true);
 	minimumVar.setReadOnly(true);
 	transientAttack.setReadOnly(true);
+	actualVar.setColour(TextEditor::backgroundColourId, Colour(0x32ffffff));
+	actualVar.setColour(TextEditor::shadowColourId, Colour(0x16000000));
+	minimumVar.setColour(TextEditor::backgroundColourId, Colour(0x32ffffff));
+	minimumVar.setColour(TextEditor::shadowColourId, Colour(0x16000000));
+	transientAttack.setColour(TextEditor::backgroundColourId, Colour(0x32ffffff));
+	transientAttack.setColour(TextEditor::shadowColourId, Colour(0x16000000));
 
 	addAndMakeVisible(midiMessagesBox);
 	midiMessagesBox.setMultiLine(true);
@@ -98,13 +122,13 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 	midiMessagesBox.setCaretVisible(false);
 	midiMessagesBox.setPopupMenuEnabled(true);
 	midiMessagesBox.setColour(TextEditor::backgroundColourId, Colour(0x32ffffff));
-	midiMessagesBox.setColour(TextEditor::outlineColourId, Colour(0x1c000000));
+	//midiMessagesBox.setColour(TextEditor::outlineColourId, Colour(0x1c000000));
 	midiMessagesBox.setColour(TextEditor::shadowColourId, Colour(0x16000000));
 
 	startTimerHz(60);
-	setSize(700, 500);
+	setSize(770, 320);
     
-    addAndMakeVisible(button0);
+    /*addAndMakeVisible(button0);
     addAndMakeVisible(button1);
     addAndMakeVisible(button2);
     addAndMakeVisible(button3);
@@ -124,7 +148,7 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
     addAndMakeVisible(button17);
     addAndMakeVisible(button18);
     addAndMakeVisible(button19);
-    addAndMakeVisible(button20);
+    addAndMakeVisible(button20);*/
  
     button0.setButtonText((String)("0"));
     button1.setButtonText((String)("1"));
@@ -213,6 +237,8 @@ void PluginDajeAudioProcessorEditor::resized()
 	panCount.setBounds(buttonsBounds.getX(), 130, buttonsBounds.getWidth(), 20);
 
 	spectralCount.setBounds(buttonsBounds.getX(), 160, buttonsBounds.getWidth(), 20);
+
+	velocitySubBar.setBounds(buttonsBounds.getX(), 190, buttonsBounds.getWidth(), 20);
     
 	velocityMessage.setBounds(buttonsBounds.getX(), 190, buttonsBounds.getWidth(), 20);
 
@@ -301,13 +327,13 @@ void PluginDajeAudioProcessorEditor::BPMDetection(double timeNow)
 {
 	if (beatDetector.transient)
 	{
-		transientAttack.setText("transientAttack: on");
+		transientAttack.applyColourToAllText(Colours::greenyellow);
 		if (timeNow - beatDetector.transientStartTime > 10)
 		{
 			beatDetector.transient = false;
 			maxVelocity = -10000;
 			minVelocity = 10000;
-			transientAttack.setText("transientAttack: off");
+			transientAttack.applyColourToAllText(Colours::white);
 		}
 	}
 
@@ -350,7 +376,7 @@ void PluginDajeAudioProcessorEditor::BPMDetection(double timeNow)
 void PluginDajeAudioProcessorEditor::manualBPM()
 {
     double timeNow = Time::getMillisecondCounterHiRes() * 0.001;
-    auto message = MidiMessage::controllerEvent(midiChannel, 0, ((int)(Time::getMillisecondCounterHiRes()) % 128));
+    auto message = MidiMessage::controllerEvent(midiChannel, 7, ((int)(Time::getMillisecondCounterHiRes()) % 128));
     
     numBeat++;
     
@@ -478,7 +504,7 @@ int PluginDajeAudioProcessorEditor::velocityRange(float energyAmount) {
 void PluginDajeAudioProcessorEditor::timerCallback()
 {
 	if (beatDetector.beforeTransient) {
-		transientAttack.setText("transientAttack: off");
+		transientAttack.applyColourToAllText(Colours::white);
 	}
 
 	if (processor.getNextFFTBlockReady())

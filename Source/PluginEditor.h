@@ -71,8 +71,9 @@ private:
 	TextEditor transientAttack;
 	TextEditor panCount;
 	TextEditor spectralCount;
+	TextEditor velocitySubBar;
 	TextEditor velocityMessage;
-
+	
 	//int countVelMess = 0;
 
     TextButton tapTempo;

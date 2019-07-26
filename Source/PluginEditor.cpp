@@ -47,6 +47,8 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 	velocitySubBar.setReadOnly(true);
 	velocitySubBar.setColour(TextEditor::backgroundColourId, Colour(0x32ffffff));
 	velocitySubBar.setColour(TextEditor::shadowColourId, Colour(0x16000000));
+	velocitySubBar.setText("Velocity: ");
+	velocitySubBar.setJustification(4);
 
 	addAndMakeVisible(velocityMessage);
 	//velocityMessage.setText("velocityMessage: calculate...");
@@ -308,6 +310,7 @@ void PluginDajeAudioProcessorEditor::setNoteNumber(int faderNumber, int velocity
 
 		//velocityMessage.setText((String)maxVelocity);
 		velocityMessage.setBounds(getLocalBounds().withWidth(getWidth() / 2).reduced(10).getX(), 190, ((velocity * getLocalBounds().withWidth(getWidth() / 2).reduced(10).getWidth()) / 127), 20);
+		velocitySubBar.setText("Velocity: " + (String)velocity);
 		//countVelMess++;
 	}
 
@@ -461,11 +464,25 @@ void PluginDajeAudioProcessorEditor::drawNextLineOfSpectrogram()
 	auto imageHeight = spectrogramImage.getHeight();
 	spectrogramImage.moveImageSection(0, 0, 1, 0, rightHandEdge, imageHeight);                       // [1]
     
-    
-    
 	forwardFFT.performFrequencyOnlyForwardTransform(processor.fftDataL);                         // [2]
 	forwardFFT.performFrequencyOnlyForwardTransform(processor.fftDataR);
     
+	float fftData[PluginDajeAudioProcessor::fftSize / 2];
+
+	for (int i = 0; i < processor.fftSize / 2; i++) {
+		fftData[i] = processor.fftDataL[i] + processor.fftDataR[i];
+	}
+
+	auto maxLevel = FloatVectorOperations::findMinAndMax(fftData, processor.fftSize / 2); // [3]
+	
+	for (auto y = 1; y < imageHeight; ++y)                                                            // [4]
+	{
+		auto skewedProportionY = 1.0f - std::exp(std::log(y / (float)imageHeight) * 0.2f);
+		auto fftDataIndex = jlimit(0, processor.fftSize / 2, (int)(skewedProportionY * processor.fftSize / 2));
+		auto level = jmap(processor.fftDataL[fftDataIndex] + processor.fftDataR[fftDataIndex], 0.0f, jmax(maxLevel.getEnd(), 1e-5f), 0.0f, 1.0f);
+		spectrogramImage.setPixelAt(rightHandEdge, y, Colour::fromHSV(level, 1.0f, level, 1.0f));   // [5]
+	}
+
     findRangeValueFunction(processor.fftDataL, 0);
 	findRangeValueFunction(processor.fftDataR, 1);
 
@@ -480,7 +497,7 @@ void PluginDajeAudioProcessorEditor::drawNextLineOfSpectrogram()
     spectralCentroid.run();         //START SPECTRAL CENTROID THREAD
     
 
-	//-----F0RSE
+	//-----FORSE
 	float energySum = beatDetector.performEnergyFFT(2);
 	setNoteNumber(0, velocityRange(energySum));
 

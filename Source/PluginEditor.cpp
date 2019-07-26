@@ -126,6 +126,7 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 	midiMessagesBox.setColour(TextEditor::backgroundColourId, Colour(0x32ffffff));
 	//midiMessagesBox.setColour(TextEditor::outlineColourId, Colour(0x1c000000));
 	midiMessagesBox.setColour(TextEditor::shadowColourId, Colour(0x16000000));
+	getLookAndFeel().setColour(ScrollBar::thumbColourId, Colours::greenyellow);
 
 	startTimerHz(60);
 	setSize(770, 320);

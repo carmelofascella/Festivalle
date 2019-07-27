@@ -83,8 +83,13 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
             numBeat = 0;
             timeAverage = 0;
             //manualMode.setButtonText("Manual Mode: on");
+			if (beatDetector.transient) {
+				minVelocity = std::numeric_limits<float>::max();
+				maxVelocity = std::numeric_limits<float>::min();
+			}
 			beatDetector.beforeTransient = false;
 			beatDetector.transient = false;
+			beatDetector.reducedTransient = false;
 			transientAttack.applyColourToAllText(Colours::white);
         }
         else {
@@ -335,9 +340,15 @@ void PluginDajeAudioProcessorEditor::BPMDetection(double timeNow)
 		if (timeNow - beatDetector.transientStartTime > 10)
 		{
 			beatDetector.transient = false;
-			maxVelocity = -10000;
-			minVelocity = 10000;
+			minVelocity = std::numeric_limits<float>::max();
+			maxVelocity = std::numeric_limits<float>::min();
 			transientAttack.applyColourToAllText(Colours::white);
+		}
+		if (beatDetector.reducedTransient)
+		{
+			beatDetector.reducedTransient = false;
+			minVelocity = std::numeric_limits<float>::max();
+			maxVelocity = std::numeric_limits<float>::min();
 		}
 	}
 
@@ -500,7 +511,7 @@ void PluginDajeAudioProcessorEditor::drawNextLineOfSpectrogram()
 
 	//-----FORSE
 	float energySum = beatDetector.performEnergyFFT(2);
-	setNoteNumber(0, velocityRange(energySum));
+	setNoteNumber(0, velocityRange(10*log10(energySum + std::numeric_limits<float>::epsilon())));
 
 }
 
@@ -512,8 +523,14 @@ int PluginDajeAudioProcessorEditor::velocityRange(float energyAmount) {
 	//if (countVelMess > 18 * 20) //ogni 20 secondi di musica circa ricalcolo max e min
 		//countVelMess = 0;
 
-	if (maxVelocity - minVelocity != 0)
-		return (int)(127 * ((energyAmount - minVelocity) / (maxVelocity - minVelocity)) - 0);
+	float ris;
+
+	if (maxVelocity - minVelocity != 0) {
+		ris = (int)(127 * ((energyAmount - minVelocity) / (maxVelocity - minVelocity)) - 0);
+		if (ris > 127)
+			ris = 127;
+		return ris;
+	}
 	else
 		return 0;
 

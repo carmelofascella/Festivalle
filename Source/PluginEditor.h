@@ -135,8 +135,8 @@ private:
     TextButton button19;
     TextButton button20;
 
-	float minVelocity = 10000; //per assegnarli con sicurezza al primo ciclo
-	float maxVelocity = -10000;
+	float minVelocity = std::numeric_limits<float>::max(); //per assegnarli con sicurezza al primo ciclo
+	float maxVelocity = std::numeric_limits<float>::min();
    
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginDajeAudioProcessorEditor)
 };

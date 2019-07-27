@@ -62,6 +62,7 @@ void BeatDetector::beatDetection() {
         //transientAttack.setText("transientAttack: on");
         transientStartTime = Time::getMillisecondCounterHiRes() * 0.001;
         transient = true;  //inizio dell'attacco
+		reducedTransient = true; //attacco ridotto per la velocity
     }
     
     

@@ -45,6 +45,7 @@ public:
 
 	bool beforeTransient = false;
 	bool transient = false;
+	bool reducedTransient = false; //per la velocity
 	double transientStartTime = 0;
     
 private:

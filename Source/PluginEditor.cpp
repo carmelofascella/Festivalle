@@ -320,7 +320,7 @@ void PluginDajeAudioProcessorEditor::setNoteNumber(int faderNumber, int velocity
 		//countVelMess++;
 	}
 
-	else if (timeNow - prevTime - startTime > 0.3)   //200bpm massimi
+	else if (timeNow - prevTime - startTime > 0.3 && !onOff)   //200bpm massimi
 	{
 		BPMDetection(timeNow);
 		prevTime = timeNow - startTime; //occhio
@@ -328,6 +328,13 @@ void PluginDajeAudioProcessorEditor::setNoteNumber(int faderNumber, int velocity
 		midiOutput->sendMessageNow(message);
 		addMessageToList(message);
 		//printf("\n%f", spectralCentroid.centroidL);
+	}
+
+	else if (onOff)
+	{
+		message.setTimeStamp(timeNow - startTime);
+		midiOutput->sendMessageNow(message);
+		addMessageToList(message);
 	}
    
 }
@@ -391,8 +398,9 @@ void PluginDajeAudioProcessorEditor::BPMDetection(double timeNow)
 void PluginDajeAudioProcessorEditor::manualBPM()
 {
     double timeNow = Time::getMillisecondCounterHiRes() * 0.001;
-    auto message = MidiMessage::controllerEvent(midiChannel, 7, ((int)(Time::getMillisecondCounterHiRes()) % 128));
-    
+    //auto message = MidiMessage::controllerEvent(midiChannel, 7, ((int)(Time::getMillisecondCounterHiRes()) % 128));
+	designLightPattern();
+
     numBeat++;
     
     if(numBeat > 1)
@@ -405,9 +413,9 @@ void PluginDajeAudioProcessorEditor::manualBPM()
 		actualBPM.setText("BPM: " + (String)BPM);
     }
     
-    message.setTimeStamp((timeNow - startTime));
+   /* message.setTimeStamp((timeNow - startTime));
     midiOutput->sendMessageNow(message);
-    addMessageToList(message);
+    addMessageToList(message);*/
 }
 
 void PluginDajeAudioProcessorEditor::logMessage(const String& m)

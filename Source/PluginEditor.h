@@ -57,6 +57,8 @@ public:
 	//Beat detection graphics methods=========================
     void BPMDetection(double timeNow);
     void manualBPM();
+
+	int setLightNumber(int index);
     void designLightPattern();
 
 private:
@@ -122,6 +124,7 @@ private:
 	float numAnimazioni = 7;
 	float spectralRange = 5; //1.5 - (-3.5)
 	float spectralRangeMin = -3.5;
+	int repetition = 0;
 
     TextButton button0;
     TextButton button1;

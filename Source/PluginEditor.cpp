@@ -98,6 +98,7 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
             varianceBeat = 50; //alta all'inizio
             numBeat = 0;
             prevTime = 0;
+			prevTimeTemp = 0;
             while(!deltaTQueue.empty()) {
                 deltaTQueue.pop();
             }
@@ -134,8 +135,27 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 	getLookAndFeel().setColour(ScrollBar::thumbColourId, Colours::greenyellow);
 
 	startTimerHz(60);
-	setSize(770, 320);
-    
+	setSize(770, 420);
+
+	addAndMakeVisible(midiChannelSelector);
+	midiChannelSelector.setRange(1, 16, 1);
+	midiChannelSelector.setTextValueSuffix(" Ch");
+	midiChannelSelector.setValue(midiChannel);
+	midiChannelSelector.addListener(this);
+
+	addAndMakeVisible(bpmMaxSelector);
+	bpmMaxSelector.setRange(1, 200, 1);
+	bpmMaxSelector.setTextValueSuffix(" BPM");
+	bpmMaxSelector.setValue(bpmMax);
+	bpmMaxSelector.addListener(this);
+
+	addAndMakeVisible(numAnimSelector);
+	numAnimSelector.setRange(7, 42, 1);
+	numAnimSelector.setTextValueSuffix(" N");
+	numAnimSelector.setValue(numAnimazioni);
+	numAnimSelector.addListener(this);
+
+
     /*addAndMakeVisible(button0);
     addAndMakeVisible(button1);
     addAndMakeVisible(button2);
@@ -235,6 +255,12 @@ void PluginDajeAudioProcessorEditor::resized()
     manualMode.setBounds(buttonsBounds.getX(), 260, buttonsBounds.getWidth(), 20);
 
 	resetVarianceBeat.setBounds(buttonsBounds.getX(), 290, buttonsBounds.getWidth(), 20);
+
+	midiChannelSelector.setBounds(buttonsBounds.getX(), 330, buttonsBounds.getWidth(), 20);
+
+	bpmMaxSelector.setBounds(buttonsBounds.getX(), 360, buttonsBounds.getWidth(), 20);
+
+	numAnimSelector.setBounds(buttonsBounds.getX(), 390, buttonsBounds.getWidth(), 20);
 	
 	actualVar.setBounds(buttonsBounds.getX(), 40, buttonsBounds.getWidth(), 20);
 
@@ -324,10 +350,15 @@ void PluginDajeAudioProcessorEditor::setNoteNumber(int faderNumber, int velocity
 	{
 		BPMDetection(timeNow);
 		prevTime = timeNow - startTime; //occhio
-		message.setTimeStamp(timeNow - startTime);
-		midiOutput->sendMessageNow(message);
-		addMessageToList(message);
-		//printf("\n%f", spectralCentroid.centroidL);
+
+		if (timeNow - prevTimeTemp - startTime > (60 / bpmMax))
+		{
+			prevTimeTemp = timeNow - startTime;
+			message.setTimeStamp(timeNow - startTime);
+			midiOutput->sendMessageNow(message);
+			addMessageToList(message);
+			//printf("\n%f", spectralCentroid.centroidL);
+		}
 	}
 
 	else if (onOff)
@@ -448,6 +479,20 @@ void PluginDajeAudioProcessorEditor::sliderValueChanged(Slider * slider)
 		processor.setThreshold(slider->getValue());
 	}*/  //Potrebbe servire
 
+	if (slider == &midiChannelSelector) {
+		midiChannel = slider->getValue();
+		//tapTempo.setButtonText((String)midiChannel);
+	}
+
+	if (slider == &bpmMaxSelector) {
+		bpmMax = slider->getValue();
+		//tapTempo.setButtonText((String)bpmMax);
+	}
+
+	if (slider == &numAnimSelector) {
+		numAnimazioni = slider->getValue();
+		//tapTempo.setButtonText((String)numAnimazioni);
+	}
 }
 
 void PluginDajeAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source)
@@ -593,7 +638,76 @@ void PluginDajeAudioProcessorEditor::scaleFunction(float* data, int index)
 void PluginDajeAudioProcessorEditor::designLightPattern()
 {
     
-    if(panFeature.panValue<-0.5) //caso left
+	for (int i = 0; i < numAnimazioni; i++) {
+		if (panFeature.panValue < -0.5) {
+			if (spectralRangeMin == -3.5) {
+				if (spectralCentroid.centroidL < spectralRangeMin)
+				{
+					setNoteNumber(i + 1, rand() % 100);
+				}
+			}
+			else if(spectralRangeMin >= 1.5) {
+				if (spectralCentroid.centroidL >= spectralRangeMin)
+				{
+					setNoteNumber(i + 1, rand() % 100);
+				}
+			}
+			else {
+				if (spectralCentroid.centroidL >= spectralRangeMin - (spectralRange / (numAnimazioni - 2)) && spectralCentroid.centroidL < spectralRangeMin)
+				{
+					setNoteNumber(i + 1, rand() % 100);
+				}
+			}
+		}
+
+		else if (panFeature.panValue > 0.5) {
+			if (spectralRangeMin == -3.5) {
+				if (spectralCentroid.centroidL < spectralRangeMin)
+				{
+					setNoteNumber(i + 1 + numAnimazioni * 2, rand() % 100);
+				}
+			}
+			else if (spectralRangeMin >= 1.5) {
+				if (spectralCentroid.centroidL > spectralRangeMin)
+				{
+					setNoteNumber(i + 1 + numAnimazioni * 2, rand() % 100);
+				}
+			}
+			else {
+				if (spectralCentroid.centroidL >= spectralRangeMin - (spectralRange / (numAnimazioni - 2)) && spectralCentroid.centroidL < spectralRangeMin)
+				{
+					setNoteNumber(i + 1 + numAnimazioni * 2, rand() % 100);
+				}
+			}
+		}
+
+		else {
+			if (spectralRangeMin == -3.5) {
+				if (spectralCentroid.centroidL < spectralRangeMin)
+				{
+					setNoteNumber(i + 1 + numAnimazioni, rand() % 100);
+				}
+			}
+			else if (spectralRangeMin >= 1.5) {
+				if (spectralCentroid.centroidL > spectralRangeMin)
+				{
+					setNoteNumber(i + 1 + numAnimazioni, rand() % 100);
+				}
+			}
+			else {
+				if (spectralCentroid.centroidL >= spectralRangeMin - (spectralRange / (numAnimazioni - 2)) && spectralCentroid.centroidL < spectralRangeMin)
+				{
+					setNoteNumber(i + 1 + numAnimazioni, rand() % 100);
+				}
+			}
+		}
+
+		spectralRangeMin += (spectralRange / (numAnimazioni - 2));
+	}
+
+	spectralRangeMin = -3.5;
+
+    /*if(panFeature.panValue<-0.5) //caso left
     {
         if(spectralCentroid.centroidL < -3.5)
         {
@@ -701,7 +815,7 @@ void PluginDajeAudioProcessorEditor::designLightPattern()
             setNoteNumber(21, rand()%100);
         }
         
-    }
+    }*/
     
 	panCount.setText("Panning: " + (String)panFeature.panValue);
 	spectralCount.setText("SpectralCentroidMid: " + (String)spectralCentroid.centroidMid);

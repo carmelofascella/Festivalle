@@ -101,6 +101,7 @@ private:
 	int numBeatSize = 12;
     int BPM = 0;
 	double prevTime = 0;
+	double prevTimeTemp = 0;
 	std::queue<double> deltaTQueue;
     
     double timeAverage = 0; //manual mode
@@ -112,7 +113,16 @@ private:
     BeatDetector beatDetector;
     SpectralCentroid spectralCentroid;
     
-    
+	Slider midiChannelSelector;
+	
+	Slider bpmMaxSelector;
+	float bpmMax = 200;
+
+	Slider numAnimSelector;
+	float numAnimazioni = 7;
+	float spectralRange = 5; //1.5 - (-3.5)
+	float spectralRangeMin = -3.5;
+
     TextButton button0;
     TextButton button1;
     TextButton button2;

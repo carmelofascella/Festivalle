@@ -662,19 +662,19 @@ void PluginDajeAudioProcessorEditor::designLightPattern()
 
 		else if (panFeature.panValue > 0.5) {
 			if (spectralRangeMin <= -3.5) {
-				if (spectralCentroid.centroidL <= -3.5)
+				if (spectralCentroid.centroidR <= -3.5)
 				{
 					setNoteNumber(i + 1 + numAnimazioni * 2, rand() % 100);
 				}
 			}
 			else if (spectralRangeMin > 1.5) {
-				if (spectralCentroid.centroidL > 1.5)
+				if (spectralCentroid.centroidR > 1.5)
 				{
 					setNoteNumber(i + 1 + numAnimazioni * 2, rand() % 100);
 				}
 			}
 			else {
-				if (spectralCentroid.centroidL > spectralRangeMin - (spectralRange / (numAnimazioni - 2)) && spectralCentroid.centroidL <= spectralRangeMin)
+				if (spectralCentroid.centroidR > spectralRangeMin - (spectralRange / (numAnimazioni - 2)) && spectralCentroid.centroidR <= spectralRangeMin)
 				{
 					setNoteNumber(i + 1 + numAnimazioni * 2, rand() % 100);
 				}
@@ -683,19 +683,19 @@ void PluginDajeAudioProcessorEditor::designLightPattern()
 
 		else {
 			if (spectralRangeMin <= -3.5) {
-				if (spectralCentroid.centroidL <= -3.5)
+				if (spectralCentroid.centroidMid <= -3.5)
 				{
 					setNoteNumber(i + 1 + numAnimazioni, rand() % 100);
 				}
 			}
 			else if (spectralRangeMin > 1.5) {
-				if (spectralCentroid.centroidL > 1.5)
+				if (spectralCentroid.centroidMid > 1.5)
 				{
 					setNoteNumber(i + 1 + numAnimazioni, rand() % 100);
 				}
 			}
 			else {
-				if (spectralCentroid.centroidL > spectralRangeMin - (spectralRange / (numAnimazioni - 2)) && spectralCentroid.centroidL <= spectralRangeMin)
+				if (spectralCentroid.centroidMid > spectralRangeMin - (spectralRange / (numAnimazioni - 2)) && spectralCentroid.centroidMid <= spectralRangeMin)
 				{
 					setNoteNumber(i + 1 + numAnimazioni, rand() % 100);
 				}

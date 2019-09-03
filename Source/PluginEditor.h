@@ -58,7 +58,7 @@ public:
     void BPMDetection(double timeNow);
     void manualBPM();
 
-	int setLightNumber(int index);
+	int setLightNumber(int index, int limit);
     void designLightPattern();
 
 private:

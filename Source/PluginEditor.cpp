@@ -155,6 +155,7 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 	numAnimSelector.setValue(numAnimazioni);
 	numAnimSelector.addListener(this);
 
+	getLookAndFeel().setColour(Slider::thumbColourId, Colours::greenyellow);
 
     /*addAndMakeVisible(button0);
     addAndMakeVisible(button1);

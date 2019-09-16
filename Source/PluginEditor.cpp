@@ -135,7 +135,7 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 	getLookAndFeel().setColour(ScrollBar::thumbColourId, Colours::greenyellow);
 
 	startTimerHz(60);
-	setSize(900, 420);
+	setSize(860, 420);
 
 	addAndMakeVisible(midiChannelSelector);
 	midiChannelSelector.setRange(1, 16, 1);
@@ -477,10 +477,18 @@ void PluginDajeAudioProcessorEditor::addMessageToList(const MidiMessage& message
 		seconds,
 		millis);
 
-	if(lightNumber < 10)
-		logMessage(timecode + " - [0" + (String)lightNumber + "]" + " " + getMidiMessageDescription(message));
-	else
-		logMessage(timecode + " - [" + (String)lightNumber + "]" + " " + getMidiMessageDescription(message));
+	if (numAnimazioni < 5) {
+		if (lightNumber < 10)
+			logMessage(timecode + " - |0" + (String)lightNumber + "|" + " " + getMidiMessageDescription(message).dropLastCharacters(3));
+		else
+			logMessage(timecode + " - |" + (String)lightNumber + "|" + " " + getMidiMessageDescription(message).dropLastCharacters(3));
+	}
+	else {
+		if (lightNumber < 10)
+			logMessage(timecode + " - |0" + (String)lightNumber + "|" + " " + getMidiMessageDescription(message).dropLastCharacters(4));
+		else
+			logMessage(timecode + " - |" + (String)lightNumber + "|" + " " + getMidiMessageDescription(message).dropLastCharacters(4));
+	}
 }
 
 void PluginDajeAudioProcessorEditor::sliderValueChanged(Slider * slider)

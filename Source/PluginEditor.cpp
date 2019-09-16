@@ -323,7 +323,7 @@ static String getMidiMessageDescription(const MidiMessage& m)
 		if (name.isEmpty())
 			name = "[" + String(m.getControllerNumber()) + "]";
 
-		return "Controller " + name + ": " + String(m.getControllerValue());
+		return "Controller " + name/* + ": " + String(m.getControllerValue())*/;
 	}
 
 	return String::toHexString(m.getRawData(), m.getRawDataSize());
@@ -477,18 +477,10 @@ void PluginDajeAudioProcessorEditor::addMessageToList(const MidiMessage& message
 		seconds,
 		millis);
 
-	if (numAnimazioni < 5) {
-		if (lightNumber < 10)
-			logMessage(timecode + " - |0" + (String)lightNumber + "|" + " " + getMidiMessageDescription(message).dropLastCharacters(3));
-		else
-			logMessage(timecode + " - |" + (String)lightNumber + "|" + " " + getMidiMessageDescription(message).dropLastCharacters(3));
-	}
-	else {
-		if (lightNumber < 10)
-			logMessage(timecode + " - |0" + (String)lightNumber + "|" + " " + getMidiMessageDescription(message).dropLastCharacters(4));
-		else
-			logMessage(timecode + " - |" + (String)lightNumber + "|" + " " + getMidiMessageDescription(message).dropLastCharacters(4));
-	}
+	if (lightNumber < 10)
+		logMessage(timecode + " - |0" + (String)lightNumber + "|" + " " + getMidiMessageDescription(message));
+	else
+		logMessage(timecode + " - |" + (String)lightNumber + "|" + " " + getMidiMessageDescription(message));
 }
 
 void PluginDajeAudioProcessorEditor::sliderValueChanged(Slider * slider)

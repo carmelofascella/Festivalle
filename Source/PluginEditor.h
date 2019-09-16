@@ -125,6 +125,7 @@ private:
 	float spectralRange = 5; //1.5 - (-3.5)
 	float spectralRangeMin = -3.5;
 	int repetition = 0;
+	int lightNumber = 11; //inizializzato solo per ragioni di sicurezza
 
     TextButton button0;
     TextButton button1;

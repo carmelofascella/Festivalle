@@ -135,7 +135,7 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 	getLookAndFeel().setColour(ScrollBar::thumbColourId, Colours::greenyellow);
 
 	startTimerHz(60);
-	setSize(770, 420);
+	setSize(900, 420);
 
 	addAndMakeVisible(midiChannelSelector);
 	midiChannelSelector.setRange(1, 16, 1);
@@ -355,8 +355,9 @@ void PluginDajeAudioProcessorEditor::setNoteNumber(int faderNumber, int velocity
 		if (timeNow - prevTimeTemp - startTime > (60 / bpmMax))
 		{
 			prevTimeTemp = timeNow - startTime;
-
-			message = MidiMessage::controllerEvent(midiChannel, setLightNumber(faderNumber, velocity), velocity);
+			lightNumber = setLightNumber(faderNumber, velocity);
+			
+			message = MidiMessage::controllerEvent(midiChannel, lightNumber, velocity);
 			message.setTimeStamp(timeNow - startTime);
 			midiOutput->sendMessageNow(message);
 			addMessageToList(message);
@@ -366,7 +367,9 @@ void PluginDajeAudioProcessorEditor::setNoteNumber(int faderNumber, int velocity
 
 	else if (onOff)
 	{
-		message = MidiMessage::controllerEvent(midiChannel, setLightNumber(faderNumber, velocity), velocity);
+		lightNumber = setLightNumber(faderNumber, velocity);
+
+		message = MidiMessage::controllerEvent(midiChannel, lightNumber, velocity);
 		message.setTimeStamp(timeNow - startTime);
 		midiOutput->sendMessageNow(message);
 		addMessageToList(message);
@@ -474,7 +477,10 @@ void PluginDajeAudioProcessorEditor::addMessageToList(const MidiMessage& message
 		seconds,
 		millis);
 
-	logMessage(timecode + "  -  " + getMidiMessageDescription(message));
+	if(lightNumber < 10)
+		logMessage(timecode + " - [0" + (String)lightNumber + "]" + " " + getMidiMessageDescription(message));
+	else
+		logMessage(timecode + " - [" + (String)lightNumber + "]" + " " + getMidiMessageDescription(message));
 }
 
 void PluginDajeAudioProcessorEditor::sliderValueChanged(Slider * slider)

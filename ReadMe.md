@@ -1,5 +1,4 @@
-Logo festivalle
-<p align="center"> <img width="225" height="225" src="ReadMe images/PoliMi Logo.png" > </p>
+<p align="center"> <img width="877" height="494" src="ReadMe images/Festivalle_polimi.JPG" > </p>
 
 # 1. The concept
 
@@ -13,9 +12,9 @@ Logo festivalle
 ##  4.2 Audio Spectral Centroid
 ##  4.3 Velocity
 
-# 5. Light's animation 
+# 5. Lights' animation 
 ##  5.1 Rules for animations' choice
-##  5.2 Animation management
+##  5.2 Animations management
 
-# 6.The rendering phase: 3D mapper + plugin 
+# 6.The rendering phase: 3D Mapper + Plugin 
 # Live Performance on stage

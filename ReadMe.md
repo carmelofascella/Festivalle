@@ -1,5 +1,5 @@
 Logo festivalle
-Logo Polimi
+<p align="center"> <img width="225" height="225" src="ReadMe images/PoliMi Logo.png" > </p>
 
 # 1. The concept
 

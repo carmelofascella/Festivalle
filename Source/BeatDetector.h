@@ -24,7 +24,7 @@ class BeatDetector    : public Component,
                         public ChangeBroadcaster
 {
 public:
-    BeatDetector(PluginDajeAudioProcessor&);
+    BeatDetector(PluginProcessor&);
     ~BeatDetector();
 
     void paint (Graphics&) override;
@@ -51,9 +51,9 @@ public:
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BeatDetector)
     
-    PluginDajeAudioProcessor& processor;
+    PluginProcessor& processor;
     
-    int dim = round(processor.getSampleRate() / PluginDajeAudioProcessor::fftSize);
+    int dim = round(processor.getSampleRate() / PluginProcessor::fftSize);
     
     
     int oldCount=0;

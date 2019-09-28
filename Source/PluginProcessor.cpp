@@ -12,7 +12,7 @@ It contains the basic framework code for a JUCE plugin processor.
 #include "PluginEditor.h"
 
 //==============================================================================
-PluginDajeAudioProcessor::PluginDajeAudioProcessor()
+PluginProcessor::PluginProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
 	: AudioProcessor(BusesProperties()
 #if ! JucePlugin_IsMidiEffect
@@ -26,17 +26,17 @@ PluginDajeAudioProcessor::PluginDajeAudioProcessor()
 {
 }
 
-PluginDajeAudioProcessor::~PluginDajeAudioProcessor()
+PluginProcessor::~PluginProcessor()
 {
 }
 
 //==============================================================================
-const String PluginDajeAudioProcessor::getName() const
+const String PluginProcessor::getName() const
 {
 	return JucePlugin_Name;
 }
 
-bool PluginDajeAudioProcessor::acceptsMidi() const
+bool PluginProcessor::acceptsMidi() const
 {
 #if JucePlugin_WantsMidiInput
 	return true;
@@ -45,7 +45,7 @@ bool PluginDajeAudioProcessor::acceptsMidi() const
 #endif
 }
 
-bool PluginDajeAudioProcessor::producesMidi() const
+bool PluginProcessor::producesMidi() const
 {
 #if JucePlugin_ProducesMidiOutput
 	return true;
@@ -54,7 +54,7 @@ bool PluginDajeAudioProcessor::producesMidi() const
 #endif
 }
 
-bool PluginDajeAudioProcessor::isMidiEffect() const
+bool PluginProcessor::isMidiEffect() const
 {
 #if JucePlugin_IsMidiEffect
 	return true;
@@ -63,50 +63,50 @@ bool PluginDajeAudioProcessor::isMidiEffect() const
 #endif
 }
 
-double PluginDajeAudioProcessor::getTailLengthSeconds() const
+double PluginProcessor::getTailLengthSeconds() const
 {
 	return 0.0;
 }
 
-int PluginDajeAudioProcessor::getNumPrograms()
+int PluginProcessor::getNumPrograms()
 {
 	return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
 				// so this should be at least 1, even if you're not really implementing programs.
 }
 
-int PluginDajeAudioProcessor::getCurrentProgram()
+int PluginProcessor::getCurrentProgram()
 {
 	return 0;
 }
 
-void PluginDajeAudioProcessor::setCurrentProgram(int index)
+void PluginProcessor::setCurrentProgram(int index)
 {
 }
 
-const String PluginDajeAudioProcessor::getProgramName(int index)
+const String PluginProcessor::getProgramName(int index)
 {
 	return {};
 }
 
-void PluginDajeAudioProcessor::changeProgramName(int index, const String& newName)
+void PluginProcessor::changeProgramName(int index, const String& newName)
 {
 }
 
 //==============================================================================
-void PluginDajeAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
+void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
 	// Use this method as the place to do any pre-playback
 	// initialisation that you need..
 }
 
-void PluginDajeAudioProcessor::releaseResources()
+void PluginProcessor::releaseResources()
 {
 	// When playback stops, you can use this as an opportunity to free up any
 	// spare memory, etc.
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool PluginDajeAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
+bool PluginProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
 {
 #if JucePlugin_IsMidiEffect
 	ignoreUnused(layouts);
@@ -129,7 +129,7 @@ bool PluginDajeAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts
 }
 #endif
 
-void PluginDajeAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
+void PluginProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
 	ScopedNoDenormals noDenormals;
 	auto totalNumInputChannels = getTotalNumInputChannels();
@@ -179,25 +179,25 @@ void PluginDajeAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuff
 }
 
 //==============================================================================
-bool PluginDajeAudioProcessor::hasEditor() const
+bool PluginProcessor::hasEditor() const
 {
 	return true; // (change this to false if you choose to not supply an editor)
 }
 
-AudioProcessorEditor* PluginDajeAudioProcessor::createEditor()
+AudioProcessorEditor* PluginProcessor::createEditor()
 {
-	return new PluginDajeAudioProcessorEditor(*this);
+	return new PluginEditor(*this);
 }
 
 //==============================================================================
-void PluginDajeAudioProcessor::getStateInformation(MemoryBlock& destData)
+void PluginProcessor::getStateInformation(MemoryBlock& destData)
 {
 	// You should use this method to store your parameters in the memory block.
 	// You could do that either as raw data, or use the XML or ValueTree classes
 	// as intermediaries to make it easy to save and load complex data.
 }
 
-void PluginDajeAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
+void PluginProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
 	// You should use this method to restore your parameters from this memory block,
 	// whose contents will have been created by the getStateInformation() call.
@@ -207,14 +207,14 @@ void PluginDajeAudioProcessor::setStateInformation(const void* data, int sizeInB
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-	return new PluginDajeAudioProcessor();
+	return new PluginProcessor();
 }
 
-double PluginDajeAudioProcessor::setThreshold(double value) {
+double PluginProcessor::setThreshold(double value) {
 	return threshold = value;
 }
 
-void PluginDajeAudioProcessor::pushNextSampleIntoFifo(float sample, int channel) noexcept
+void PluginProcessor::pushNextSampleIntoFifo(float sample, int channel) noexcept
 {
 	if (channel == 0)
 	{
@@ -247,22 +247,22 @@ void PluginDajeAudioProcessor::pushNextSampleIntoFifo(float sample, int channel)
 }
 
 
-/*float* PluginDajeAudioProcessor::getFFTData() {
+/*float* PluginProcessor::getFFTData() {
 	return fftData;
 }
 
-float PluginDajeAudioProcessor::getFFTDataIndex(int index) {
+float PluginProcessor::getFFTDataIndex(int index) {
 	return fftData[index];
 }*/
 
-bool PluginDajeAudioProcessor::getNextFFTBlockReady() {
+bool PluginProcessor::getNextFFTBlockReady() {
 	return nextFFTBlockReady;
 }
 
-void PluginDajeAudioProcessor::setNextFFTBlockReady(bool setup) {
+void PluginProcessor::setNextFFTBlockReady(bool setup) {
 	nextFFTBlockReady = setup;
 }
 
-void PluginDajeAudioProcessor::setThreadBoolean(bool setup){
+void PluginProcessor::setThreadBoolean(bool setup){
     threadFlag = setup;
 }

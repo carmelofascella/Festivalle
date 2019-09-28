@@ -24,14 +24,14 @@ It contains the basic framework code for a JUCE plugin editor.
 //==============================================================================
 /**
 */
-class PluginDajeAudioProcessorEditor : public AudioProcessorEditor,
+class PluginEditor : public AudioProcessorEditor,
 	public ChangeListener,
 	public Slider::Listener,
 	private Timer
 {
 public:
-	PluginDajeAudioProcessorEditor(PluginDajeAudioProcessor&);
-	~PluginDajeAudioProcessorEditor();
+	PluginEditor(PluginProcessor&);
+	~PluginEditor();
 
 	//==============================================================================
 	void paint(Graphics&) override;
@@ -64,7 +64,7 @@ public:
 private:
 	// This reference is provided as a quick way for your editor to
 	// access the processor object that created it.
-	PluginDajeAudioProcessor& processor;
+	PluginProcessor& processor;
 	TextEditor midiMessagesBox;
     
 	TextEditor actualBPM;
@@ -87,7 +87,8 @@ private:
 	int midiChannel = 8;
 	double startTime;
 
-	MidiOutput *midiOutput;
+	//std::unique_ptr<MidiOutput> midiOutput;
+    MidiOutput* midiOutput;
 
 	dsp::FFT forwardFFT;            // [3]
 	Image spectrogramImage;
@@ -152,5 +153,5 @@ private:
 	float minVelocity = std::numeric_limits<float>::max(); //per assegnarli con sicurezza al primo ciclo
 	float maxVelocity = std::numeric_limits<float>::min();
    
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginDajeAudioProcessorEditor)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
 };

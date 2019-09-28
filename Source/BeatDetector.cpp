@@ -13,8 +13,7 @@
 #include "PluginProcessor.h"
 
 //==============================================================================
-BeatDetector::BeatDetector (PluginDajeAudioProcessor& p)
-:Thread("BeatDetectorThread"), processor(p)
+BeatDetector::BeatDetector (PluginProcessor& p):Thread("BeatDetectorThread"), processor(p)
 {
     kickmin = round(60 / dim);
     kickmax = round(130 / dim);

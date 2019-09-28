@@ -12,9 +12,9 @@ It contains the basic framework code for a JUCE plugin editor.
 #include "PluginEditor.h"
 
 //==============================================================================
-PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioProcessor& p)
+PluginEditor::PluginEditor(PluginProcessor& p)
 	: AudioProcessorEditor(&p), processor(p), startTime(Time::getMillisecondCounterHiRes() * 0.001),
-	forwardFFT(PluginDajeAudioProcessor::fftOrder), spectrogramImage(Image::RGB, 512, 512, true), panFeature(processor), beatDetector(processor), spectralCentroid(processor)
+	forwardFFT(PluginProcessor::fftOrder), spectrogramImage(Image::RGB, 512, 512, true), panFeature(processor), beatDetector(processor), spectralCentroid(processor)
 {
     panFeature.addChangeListener(this);
     beatDetector.addChangeListener(this);
@@ -24,6 +24,7 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 
     StringArray midiOutputList = MidiOutput::getDevices();
     int portIndex = midiOutputList.indexOf("loopMIDI Port");
+    
     if (portIndex != -1)
         midiOutput = MidiOutput::openDevice(portIndex); //WINDOWS
     else
@@ -226,12 +227,12 @@ PluginDajeAudioProcessorEditor::PluginDajeAudioProcessorEditor(PluginDajeAudioPr
 
 }
 
-PluginDajeAudioProcessorEditor::~PluginDajeAudioProcessorEditor()
+PluginEditor::~PluginEditor()
 {
 }
 
 //==============================================================================
-void PluginDajeAudioProcessorEditor::paint(Graphics& g)
+void PluginEditor::paint(Graphics& g)
 {
 	g.fillAll(Colours::black);
 	g.setOpacity(1.0f);
@@ -239,7 +240,7 @@ void PluginDajeAudioProcessorEditor::paint(Graphics& g)
 
 }
 
-void PluginDajeAudioProcessorEditor::resized()
+void PluginEditor::resized()
 {
 	// This is generally where you'll want to lay out the positions of any
 	// subcomponents in your editor..
@@ -329,7 +330,7 @@ static String getMidiMessageDescription(const MidiMessage& m)
 	return String::toHexString(m.getRawData(), m.getRawDataSize());
 }
 
-void PluginDajeAudioProcessorEditor::setNoteNumber(int faderNumber, int velocity)
+void PluginEditor::setNoteNumber(int faderNumber, int velocity)
 {
     //auto message = MidiMessage::noteOn(midiChannel, noteNumber, (uint8)100);
     auto message = MidiMessage::controllerEvent(midiChannel, faderNumber, velocity);
@@ -377,7 +378,7 @@ void PluginDajeAudioProcessorEditor::setNoteNumber(int faderNumber, int velocity
    
 }
 
-void PluginDajeAudioProcessorEditor::BPMDetection(double timeNow) 
+void PluginEditor::BPMDetection(double timeNow)
 {
 	if (beatDetector.transient)
 	{
@@ -433,7 +434,7 @@ void PluginDajeAudioProcessorEditor::BPMDetection(double timeNow)
 	}
 }
 
-void PluginDajeAudioProcessorEditor::manualBPM()
+void PluginEditor::manualBPM()
 {
     double timeNow = Time::getMillisecondCounterHiRes() * 0.001;
     //auto message = MidiMessage::controllerEvent(midiChannel, 7, ((int)(Time::getMillisecondCounterHiRes()) % 128));
@@ -456,13 +457,13 @@ void PluginDajeAudioProcessorEditor::manualBPM()
     addMessageToList(message);*/
 }
 
-void PluginDajeAudioProcessorEditor::logMessage(const String& m)
+void PluginEditor::logMessage(const String& m)
 {
 	midiMessagesBox.moveCaretToEnd();
 	midiMessagesBox.insertTextAtCaret(m + newLine);
 }
 
-void PluginDajeAudioProcessorEditor::addMessageToList(const MidiMessage& message)
+void PluginEditor::addMessageToList(const MidiMessage& message)
 {
 	auto time = message.getTimeStamp();
 
@@ -483,7 +484,7 @@ void PluginDajeAudioProcessorEditor::addMessageToList(const MidiMessage& message
 		logMessage(timecode + " - |" + (String)lightNumber + "|" + " " + getMidiMessageDescription(message));
 }
 
-void PluginDajeAudioProcessorEditor::sliderValueChanged(Slider * slider)
+void PluginEditor::sliderValueChanged(Slider * slider)
 {
 	/*if (slider == &thresholdSlider) {
 		processor.setThreshold(slider->getValue());
@@ -505,7 +506,7 @@ void PluginDajeAudioProcessorEditor::sliderValueChanged(Slider * slider)
 	}
 }
 
-void PluginDajeAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source)
+void PluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
 
     /*if(source == &panFeature )
@@ -533,7 +534,7 @@ void PluginDajeAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* s
 }
 
 
-void PluginDajeAudioProcessorEditor::drawNextLineOfSpectrogram()
+void PluginEditor::drawNextLineOfSpectrogram()
 {
 	auto rightHandEdge = spectrogramImage.getWidth() - 1;
 	auto imageHeight = spectrogramImage.getHeight();
@@ -542,7 +543,7 @@ void PluginDajeAudioProcessorEditor::drawNextLineOfSpectrogram()
 	forwardFFT.performFrequencyOnlyForwardTransform(processor.fftDataL);                         // [2]
 	forwardFFT.performFrequencyOnlyForwardTransform(processor.fftDataR);
     
-	float fftData[PluginDajeAudioProcessor::fftSize / 2];
+	float fftData[PluginProcessor::fftSize / 2];
 
 	for (int i = 0; i < processor.fftSize / 2; i++) {
 		fftData[i] = processor.fftDataL[i] + processor.fftDataR[i];
@@ -578,7 +579,7 @@ void PluginDajeAudioProcessorEditor::drawNextLineOfSpectrogram()
 
 }
 
-int PluginDajeAudioProcessorEditor::velocityRange(float energyAmount) {
+int PluginEditor::velocityRange(float energyAmount) {
 	if (energyAmount > maxVelocity/* || countVelMess > 18 * 20*/) //18: numero di messaggi al secondo circa
 		maxVelocity = energyAmount;
 	if (energyAmount < minVelocity/* || countVelMess > 18 * 20*/)
@@ -599,7 +600,7 @@ int PluginDajeAudioProcessorEditor::velocityRange(float energyAmount) {
 
 }
 
-void PluginDajeAudioProcessorEditor::timerCallback()
+void PluginEditor::timerCallback()
 {
 	if (beatDetector.beforeTransient) {
 		transientAttack.applyColourToAllText(Colours::white);
@@ -613,11 +614,11 @@ void PluginDajeAudioProcessorEditor::timerCallback()
 	}
 }
 
-void PluginDajeAudioProcessorEditor::findRangeValueFunction(float* data, int index)
+void PluginEditor::findRangeValueFunction(float* data, int index)
 {
     //float* data = processor.getFFTData();
 
-    for(int i = 0; i < PluginDajeAudioProcessor::fftSize / 2; i++) {
+    for(int i = 0; i < PluginProcessor::fftSize / 2; i++) {
         if(data[i] > maxAbs)
             maxAbs = data[i];
         if(data[i] < minAbs)
@@ -628,22 +629,22 @@ void PluginDajeAudioProcessorEditor::findRangeValueFunction(float* data, int ind
    
 }
 
-void PluginDajeAudioProcessorEditor::scaleFunction(float* data, int index)
+void PluginEditor::scaleFunction(float* data, int index)
 {
     if(index == 0 && maxAbs - minAbs != 0)
-		for(int i=0; i < PluginDajeAudioProcessor::fftSize; i++){
+		for(int i=0; i < PluginProcessor::fftSize; i++){
 			//processor.getFFTData()[i] =  ((data[i]-min) * (1-(-1))) / ((max-min)+(-1))  ;
 			processor.fftDataL[i] = 1 *((data[i] - minAbs) / (maxAbs - minAbs)) - 0;
 		}
 	else if(index == 1 && maxAbs - minAbs != 0)
-		for (int i = 0; i < PluginDajeAudioProcessor::fftSize; i++) {
+		for (int i = 0; i < PluginProcessor::fftSize; i++) {
 			//processor.getFFTData()[i] =  ((data[i]-min) * (1-(-1))) / ((max-min)+(-1))  ;
 			processor.fftDataR[i] = 1 * ((data[i] - minAbs) / (maxAbs - minAbs)) - 0;
 		}
     
 }
 
-int PluginDajeAudioProcessorEditor::setLightNumber(int index, int limit) 
+int PluginEditor::setLightNumber(int index, int limit)
 {
 	if (repetition == index)
 	{
@@ -665,7 +666,7 @@ int PluginDajeAudioProcessorEditor::setLightNumber(int index, int limit)
 
 }
 
-void PluginDajeAudioProcessorEditor::designLightPattern()
+void PluginEditor::designLightPattern()
 {
     
 	for (int i = 0; i < numAnimazioni; i++) {

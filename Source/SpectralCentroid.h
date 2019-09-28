@@ -20,7 +20,7 @@ class SpectralCentroid    : public Component,
                             public ChangeBroadcaster
 {
 public:
-    SpectralCentroid(PluginDajeAudioProcessor&);
+    SpectralCentroid(PluginProcessor&);
     ~SpectralCentroid();
 
     void paint (Graphics&) override;
@@ -39,14 +39,14 @@ public:
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectralCentroid)
     
-    PluginDajeAudioProcessor& processor;
-    float powerSpectrumL[PluginDajeAudioProcessor::fftSize];
-    float powerSpectrumR[PluginDajeAudioProcessor::fftSize];
+    PluginProcessor& processor;
+    float powerSpectrumL[PluginProcessor::fftSize];
+    float powerSpectrumR[PluginProcessor::fftSize];
     
-    float centersFreq[PluginDajeAudioProcessor::fftSize];
+    float centersFreq[PluginProcessor::fftSize];
 
     
-	int rangeFreq = round(processor.getSampleRate() / PluginDajeAudioProcessor::fftSize);
+	int rangeFreq = round(processor.getSampleRate() / PluginProcessor::fftSize);
     
     float maxL=0;
     float maxR=0;

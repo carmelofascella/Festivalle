@@ -13,7 +13,7 @@
 #include "PluginProcessor.h"
 
 //==============================================================================
-SpectralCentroid::SpectralCentroid(PluginDajeAudioProcessor& p)
+SpectralCentroid::SpectralCentroid(PluginProcessor& p)
 :Thread("SpectralCentroidThread"), processor(p)
 {
     // In your constructor, you should add any child components, and
@@ -53,7 +53,7 @@ void SpectralCentroid::spectralCentroidFunction()
     powerSpectrumFunction();
     
     
-    for(int i = 0; i <= PluginDajeAudioProcessor::fftSize / 2 - 1; i++)
+    for(int i = 0; i <= PluginProcessor::fftSize / 2 - 1; i++)
     {
         numL +=  log2(centersFreq[i] / 1000 ) * powerSpectrumL[i + 1];
         numR +=  log2(centersFreq[i] / 1000 ) * powerSpectrumR[i + 1];
@@ -88,7 +88,7 @@ void SpectralCentroid::spectralCentroidFunction()
 void SpectralCentroid::powerSpectrumFunction()
 {
     //printf("\n");
-    for(int i = 0; i < PluginDajeAudioProcessor::fftSize; i++)
+    for(int i = 0; i < PluginProcessor::fftSize; i++)
     {
         powerSpectrumL[i] = processor.fftDataL[i] * processor.fftDataL[i];
         powerSpectrumR[i] = processor.fftDataR[i] * processor.fftDataR[i];
@@ -108,7 +108,7 @@ void SpectralCentroid::centersGrativtyFunction()
 {
 	centersFreq[0] = rangeFreq;
 
-    for(int i = 1; i < PluginDajeAudioProcessor::fftSize; i++)
+    for(int i = 1; i < PluginProcessor::fftSize; i++)
     {
         centersFreq[i] = rangeFreq * (i + 1);
     }

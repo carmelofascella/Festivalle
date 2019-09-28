@@ -21,7 +21,7 @@ class PanFeature    : public Component,
                       public ChangeBroadcaster
 {
 public:
-    PanFeature(PluginDajeAudioProcessor&);
+    PanFeature(PluginProcessor&);
     ~PanFeature();
 
     
@@ -36,7 +36,7 @@ public:
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PanFeature);
     
-    PluginDajeAudioProcessor& processor;
+    PluginProcessor& processor;
     
 
 };

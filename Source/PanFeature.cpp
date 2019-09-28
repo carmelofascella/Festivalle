@@ -13,7 +13,7 @@
 #include "PluginProcessor.h"
 
 //==============================================================================
-PanFeature::PanFeature (PluginDajeAudioProcessor& p)
+PanFeature::PanFeature (PluginProcessor& p)
 :Thread("PanThread"), processor(p)
 {
     // In your constructor, you should add any child components, and
@@ -61,7 +61,7 @@ void PanFeature::panFeatureFunction()
         
     }
     
-    panValue = (float)(panRight - panLeft)/ (PluginDajeAudioProcessor::fftSize / 2);
+    panValue = (float)(panRight - panLeft)/ (PluginProcessor::fftSize / 2);
     
     
     //sendChangeMessage();

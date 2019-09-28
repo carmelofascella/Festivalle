@@ -16,13 +16,13 @@ It contains the basic framework code for a JUCE plugin processor.
 //==============================================================================
 /**
 */
-class PluginDajeAudioProcessor : public AudioProcessor,
+class PluginProcessor : public AudioProcessor,
 	public ChangeBroadcaster
 {
 public:
 	//==============================================================================
-	PluginDajeAudioProcessor();
-	~PluginDajeAudioProcessor();
+	PluginProcessor();
+	~PluginProcessor();
 
 	//==============================================================================
 	void prepareToPlay(double sampleRate, int samplesPerBlock) override;
@@ -100,5 +100,5 @@ private:
     bool threadFlag=true;
     
 //==============================================================================
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginDajeAudioProcessor)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginProcessor)
 };

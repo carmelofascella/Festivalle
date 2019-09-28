@@ -1,0 +1,34 @@
+﻿  PluginProcessor.cpp
+  PluginEditor.cpp
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\beatdetector.h(56): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data (compiling source file ..\..\Source\PluginEditor.cpp)
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\spectralcentroid.h(49): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data (compiling source file ..\..\Source\PluginEditor.cpp)
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\beatdetector.h(56): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data (compiling source file ..\..\Source\PluginProcessor.cpp)
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\spectralcentroid.h(49): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data (compiling source file ..\..\Source\PluginProcessor.cpp)
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\pluginprocessor.cpp(82): warning C4100: 'index': unreferenced formal parameter
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\pluginprocessor.cpp(86): warning C4100: 'index': unreferenced formal parameter
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\pluginprocessor.cpp(91): warning C4100: 'newName': unreferenced formal parameter
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\pluginprocessor.cpp(91): warning C4100: 'index': unreferenced formal parameter
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\pluginprocessor.cpp(96): warning C4100: 'samplesPerBlock': unreferenced formal parameter
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\pluginprocessor.cpp(96): warning C4100: 'sampleRate': unreferenced formal parameter
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\pluginprocessor.cpp(132): warning C4100: 'midiMessages': unreferenced formal parameter
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\pluginprocessor.cpp(193): warning C4100: 'destData': unreferenced formal parameter
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\pluginprocessor.cpp(200): warning C4100: 'sizeInBytes': unreferenced formal parameter
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\pluginprocessor.cpp(200): warning C4100: 'data': unreferenced formal parameter
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\plugineditor.cpp(421): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\plugineditor.cpp(451): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\plugineditor.cpp(494): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\plugineditor.cpp(499): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\plugineditor.cpp(504): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\plugineditor.cpp(509): warning C4100: 'source': unreferenced formal parameter
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\plugineditor.cpp(593): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\plugineditor.cpp(596): warning C4244: 'return': conversion from 'float' to 'int', possible loss of data
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\plugineditor.cpp(677): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\plugineditor.cpp(684): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\plugineditor.cpp(691): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\plugineditor.cpp(701): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\plugineditor.cpp(708): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\plugineditor.cpp(715): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\plugineditor.cpp(725): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\plugineditor.cpp(732): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\davide mori\desktop\festivalle\codice fest nuovo\source\plugineditor.cpp(739): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  Festivalle_SharedCode.vcxproj -> C:\Users\Davide Mori\Desktop\Festivalle\CODICE FEST NUOVO\Builds\VisualStudio2017\x64\Debug\Shared Code\Festivalle.lib

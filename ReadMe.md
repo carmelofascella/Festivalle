@@ -5,6 +5,7 @@
 The goal of this project is the automated control of the dynamic lighting of an architectural structure composed by LED stripes: this is done by a plug-in which analyzes the mixer-output audio signal in real-time.
 
 # 2. Plugin Interface
+
 ![gif](images/interface.gif)
 The Plug-in is all made by using the C++ JUCE application framework. 
 # 3. The Algorithm
@@ -30,7 +31,7 @@ Since this Plug-in is mainly thought for electro-music situations, we are mostly
 
 For every 1024-samples frame we calculate the energy associated. Since we are analyzing 1024 samples of audio, to take 1 second history we need to store 43 blocks in an array and then calculate the average energy for that second. Then, every 1024 samples a threshold is calculated based on the variance of the "history energy array" calculated before and that is updated every 1024 samples to improve the real-time performances. If the difference of energy pass that certain threshold we can say there is a beat.
 
-<p align="center"> <img width="1076" height="460" src="images/beattrack(3).png" > </p>
+<p align="center"> <img width="538" height="230" src="images/beattrack(3).png" > </p>
 
 
 

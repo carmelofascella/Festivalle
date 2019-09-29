@@ -22,7 +22,7 @@ The basic idea of the algorithm is to use a simple statistical model based on so
 
 The first choise to make for the analysis of the audio frame is the window: the one chosen here is a rectangular one 1024 samples large with 0% overlap, to avoid latency problems and because we do not care a specific frequency tracking. The sampling frequency that we are considering is 44100 Hz.
 
-<p align="center"> <img width="877" height="494" src="images/beattrack_0(1).png" > </p>
+<p align="center"> <img width="575" height="218" src="images/beattrack_0(1).png" > </p>
 
 Since this Plug-in is mainly thought for electro-music situations, we are mostly interested in a few range of frequencies: the choice has been made considering the "snare" [range]  and "kick" [range]  frequency range where we are sure to find the beat of interest.
 

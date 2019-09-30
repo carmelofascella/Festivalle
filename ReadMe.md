@@ -6,7 +6,8 @@ The goal of this project is the automated control of the dynamic lighting of an 
 
 # 2. Plugin Interface
 
-![gif](images/interface.gif)
+![gif](images/interface.gif)<br>
+
 The Plug-in is all made by using the C++ JUCE application framework. 
 # 3. The Algorithm
 
@@ -18,8 +19,6 @@ The Algorithm is based on few simples points:
 
 ##  3.1 Beat Tracking algorithm
 The beat tracking algorithm is mainly based on a statistical model which use the energy content of the audio signal.
-
-The basic idea of the algorithm is to use a simple statistical model based on sound energy. We can calculate the average energy of a couple of seconds of the sound before the current playback and compare this with the current energy of the sound, if the difference of energy pass a certain threshold we can say there is a beat.
 
 The first choise to make for the analysis of the audio frame is the window: the one chosen here is a rectangular one 1024 samples large with 0% overlap, to avoid latency problems and because we do not care a specific frequency tracking. The sampling frequency that we are considering is 44100 Hz.
 

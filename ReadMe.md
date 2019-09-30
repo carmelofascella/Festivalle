@@ -62,12 +62,26 @@ It is calculated considering the audio energy content in the low-frequency band 
 ![gif](images/velocity(2).gif) <br>
 
 # 5. Lights' animation 
+For the choice of a given set of light patterns, we need a bunch of rules which depend on the feature extracted. 
 ##  5.1 Rules for animations' choice
+
+Looking at the tree in the figure below, the path to follow is straightforward: <br>
+&nbsp; &nbsp;1 - a beat is detected; <br>
+&nbsp; &nbsp;2 - the panning value extracted is checked to be at left or center or right; <br>
+&nbsp; &nbsp;3 - once the branch is chosen, depending on the value of the Audio Spectral Centroid (ASC) a given number of MIDI control message(in a range from 1 to 42 maximum per branch) is chosen to be sent to the lights' controller software. This message with that number will activate the corrisponding animation designed by the user.<br>
+
+<p align="center"> <img width="732" height="244" src="images/tree.png" > </p>
+
 ##  5.2 Animations management
+In this section we look at the Animation Management part which is placed at the bottom of the interface:<br>
+
+&nbsp; &nbsp;1 - The first command allows the user to choose among 16 different channels through which send the MIDI messages;<br>
+&nbsp; &nbsp;2 - The second command allows the user to "slow down" the sending of the MIDI messages according to the beat. Indeed, if the song      currently playing had too quick four on the floors, this would lead to many animation changes over the time.<br>
+&nbsp; &nbsp;3 - The third command allows the user to manually decide how many and what kind of animations activate.<br>
+
+<p align="center"> <img width="511" height="117" src="images/animation_management.png" > </p>
 
 # 6.The rendering phase: 3D Mapper + Plugin 
-
-
 
 
 # Live Performance on stage

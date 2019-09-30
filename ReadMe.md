@@ -18,6 +18,7 @@ The Algorithm is based on few simples points:
 - Once features are extracted, a MIDI message created by a set of rules related to those characteristics is sent, in order to activate 3N possible light patterns.
 
 ##  3.1 Beat Tracking algorithm
+
 The beat tracking algorithm is mainly based on a statistical model which use the energy content of the audio signal.
 
 The first choise to make for the analysis of the audio frame is the window: the one chosen here is a rectangular one 1024 samples large with 0% overlap, to avoid latency problems and because we do not care a specific frequency tracking. The sampling frequency that we are considering is 44100 Hz.
@@ -37,8 +38,24 @@ For every 1024-samples frame we calculate the energy associated. Since we are an
 
 
 # 4. Feature extraction phase
+
+Features' extraction is a crucial phase for what concern the rules for the choice of the lights' animations: this is made in real-time, frame by frame and independently from the beat-tracking algorithm.
+
 ##  4.1 Panning
+
+The panning feature checks every 1024 samples the average energy content whithin each channel (Left and Right) to determine whether the signal is more present in one side with respect to the other. The energy is normalized between 0 and 1: subtracting the results of the  L-channel from the R-channel ones we can obtain different infos, -1 if the sound is completely panned to the left, 0 to the center, 1 to the right or among these values.
+
 ##  4.2 Audio Spectral Centroid
+
+The audio spectral centroid (ASC) gives the center of mass of a log-frequency power spectrum.
+
+>Because the spectral centroid is a good predictor of the "brightness" of a sound it is widely used in digital audio and music processing as an automatic measure of musical timbre.
+
+<p align="center"> <img width="683" height="123" src="images/spectralcentroid1.JPG" > </p>
+
+
+All coefficients below 62.5Hz are summed and represented by a single coefficient, in order to prevent a non-zero DC component and/or very low frequency components from having a disproportionate weight
+
 ##  4.3 Velocity
 
 # 5. Lights' animation 

@@ -8,6 +8,7 @@ This is realized by a plug-in which analyzes the mixer-output audio signal in re
 ![gif](images/interface.gif)<br>
 
 The Plug-in is all made by using the C++ JUCE application framework. 
+
 # The Algorithm
 
 The Algorithm is based on few simples points:
@@ -20,7 +21,7 @@ The Algorithm is based on few simples points:
 
 The beat tracking algorithm is mainly based on a statistical model which use the energy content of the audio signal.
 
-The first choise to make for the analysis of the audio frame is the window: the one chosen here is a rectangular one 1024 samples large with 0% overlap, to avoid latency problems and because we do not care a specific frequency tracking. The sampling frequency that we are considering is 44100 Hz.
+The first choice to make for the analysis of the audio frame is the window: the one chosen here is a rectangular one 1024 samples large with 0% overlap, to avoid latency problems and because we do not care a specific frequency tracking. The sampling frequency that we are considering is 44100 Hz.
 
 <p align="center"> <img width="575" height="218" src="images/beattrack_0(1).png" > </p>
 
@@ -61,7 +62,9 @@ It is calculated considering the audio energy content in the low-frequency band 
 ![gif](images/velocity(2).gif) <br>
 
 # Lights' animation 
+
 For the choice of a given set of light patterns, we need a bunch of rules which depend on the feature extracted. 
+
 ##  Rules for animations' choice
 
 Looking at the tree in the figure below, the path to follow is straightforward: <br>
@@ -72,6 +75,7 @@ Looking at the tree in the figure below, the path to follow is straightforward: 
 <p align="center"> <img width="732" height="244" src="images/tree.png" > </p>
 
 ##  Animations management
+
 In this section we look at the Animation Management part which is placed at the bottom of the interface:<br>
 
 &nbsp; &nbsp;1 - The first command allows the user to choose among 16 different channels through which send the MIDI messages;<br>

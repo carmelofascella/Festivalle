@@ -25,7 +25,7 @@ The first choice to make for the analysis of the audio frame is the window: the 
 
 <p align="center"> <img width="575" height="218" src="images/beattrack_0(1).png" > </p>
 
-Since this Plug-in is mainly thought for electro-music situations, we are mostly interested in a few range of frequencies: the choice has been made considering the "snare" [range]  and "kick" [range]  frequency range where we are sure to find the beat of interest.
+Since this Plug-in is mainly thought for electro-music situations, we are mostly interested in a few range of frequencies: the choice has been made considering the "snare" 300-750Hz  and "kick" 60-130Hz  frequency range where we are sure to find the beat of interest.
 
 <p align="center"> <img width="475" height="159" src="images/beattrack_0(2).png" > </p>
 

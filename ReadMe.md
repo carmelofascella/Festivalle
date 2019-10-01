@@ -1,7 +1,7 @@
 # The concept
 
-The goal of this project is to automate the control of the lighting of an architectural structure composed by LED stripes in a dynamic and smart way, during an electronic music show. 
-This is realized by a plug-in which analyzes the mixer-output audio signal in real-time and it communicates with a software which can handle the lights' animations thanks to the MIDI protocol.
+The goal of this project is to automate the control of the lighting of an architectural structure composed by LED stripes in a dynamic and smart way, during an electronic music show. <br>
+This is realized by a plug-in which analyzes the mixer-output audio signal in real-time and it communicates with a software which can handle the lights' animations thanks to the MIDI protocol. <br>
 
 # Plugin Interface
 
@@ -85,19 +85,19 @@ In this section we look at the Animation Management part which is placed at the 
 
 # Live Performance on stage
 
-# References 
+## References 
 
--Christian Barrio, «Beat Detection Algorithm», available at https://www.parallelcube.com/2018/03/30/beat-detection-algorithm/ .
--Bruno Digiorgi, Massimiliano Zanoni, Sebastian Bock, Augusto Sarti, «Multipath Beat Tracking» .
--George Tzanetakis, Randy Jones, and Kirk McNally, «Stereo panning features for classifying recording production style.
--Fabio Antonacci, «An introduction to sound classification» .
--Augusto Sarti, «Sound Analysis Tools» .
+-Christian Barrio, «Beat Detection Algorithm», available at https://www.parallelcube.com/2018/03/30/beat-detection-algorithm/ <br>
+-Bruno Digiorgi, Massimiliano Zanoni, Sebastian Bock, Augusto Sarti, «Multipath Beat Tracking» <br>
+-George Tzanetakis, Randy Jones, and Kirk McNally, «Stereo panning features for classifying recording production style <br>
+-Fabio Antonacci, «An introduction to sound classification» <br>
+-Augusto Sarti, «Sound Analysis Tools» <br>
 
-# Software Developers Team
+## Software Developers Team
 
-Davide Dal Cortivo.
-Edoardo Epifani.
-Carmelo Fascella.
-Davide Gioiosa.
-Davide Mori.
-Francesco Pino.
+Davide Dal Cortivo <br>
+Edoardo Epifani <br>
+Carmelo Fascella <br>
+Davide Gioiosa <br>
+Davide Mori <br>
+Francesco Pino <br>

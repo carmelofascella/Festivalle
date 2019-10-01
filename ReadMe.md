@@ -104,11 +104,11 @@ The animations were created with 3D Mapper based on the LED system, their dispos
 
 ## References 
 
--Christian Barrio, «Beat Detection Algorithm», available at https://www.parallelcube.com/2018/03/30/beat-detection-algorithm/ <br>
--Bruno Digiorgi, Massimiliano Zanoni, Sebastian Bock, Augusto Sarti, «Multipath Beat Tracking» <br>
--George Tzanetakis, Randy Jones, and Kirk McNally, «Stereo panning features for classifying recording production style <br>
--Fabio Antonacci, «An introduction to sound classification» <br>
--Augusto Sarti, «Sound Analysis Tools» <br>
+- Christian Barrio, «Beat Detection Algorithm», available at https://www.parallelcube.com/2018/03/30/beat-detection-algorithm/ <br>
+- Bruno Digiorgi, Massimiliano Zanoni, Sebastian Bock, Augusto Sarti, «Multipath Beat Tracking» <br>
+- George Tzanetakis, Randy Jones, and Kirk McNally, «Stereo panning features for classifying recording production style <br>
+- Fabio Antonacci, «An introduction to sound classification» <br>
+- Augusto Sarti, «Sound Analysis Tools» <br>
 
 ## Software Developers Team
 

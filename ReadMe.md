@@ -1,21 +1,20 @@
 # The concept
-
 The goal of this project is to automate the control of the lighting of an architectural structure composed by LED stripes in a dynamic and smart way, during an electronic music show. <br>
 This is realized by a plug-in which analyzes the mixer-output audio signal in real-time and it communicates with a software which can handle the lights' animations thanks to the MIDI protocol. <br>
 
 # Plugin Interface
 
-![gif](images/interface.gif)<br>
+The Plug-in is all made by using the C++ JUCE application framework and shows up like in the GIF below. 
 
-The Plug-in is all made by using the C++ JUCE application framework. 
+![gif](images/interface.gif)
 
 # The Algorithm
 
-The Algorithm is based on few simples points:
+The Algorithm is based on few simple points:
 
-- Beat detection frame by frame from the signal and the BPM calculus from it;
-- Features extraction from the actual audio frame: audio panning, Audio Spectral Centroid (for audio "brightness" calculation) and velocity (as an indicator of the audio intensity);
-- Once features are extracted, a MIDI message created by a set of rules related to those characteristics is sent, in order to activate 3*N possible light patterns, where N is the number of the available animations for each of the 3 sets of the brightness' value of the actual frame.
+- **Beat tracking** frame by frame from the signal and the **BPM calculus** from it;
+- **Features extraction** from the actual audio frame: audio panning, Audio Spectral Centroid (for audio "brightness" calculation) and velocity (as an indicator of the audio intensity);
+- Once features are extracted, a MIDI message created by a set of rules related to those characteristics is sent, in order to activate 3xN possible **light patterns**, where N is the number of the available animations for each of the 3 sets of the brightness' value of the actual frame.
 
 ##  Beat Tracking algorithm
 
@@ -33,15 +32,25 @@ For every 1024-samples frame we calculate the energy associated. Since we are an
 
 <p align="center"> <img width="538" height="230" src="images/beattrack(3).png" > </p>
 
-# Feature extraction phase
+## BPM calculus and interface's parameters <br>
+
+The BPM calculus is done by considering the time differences among the beats that are intercepted by the algorithm. To keep it up to date, given the number of beats (after several tests it was decided to consider 13) the 12 differences of time in seconds between a beat and the other are inserted in a queue and the variance of these differences is calculated. Saved this value as the lowest variance found (*minimumVar*), as a beat is detected, a pop on the queue is done and then a new time difference is added. Then, the current variance (*actualVar*) is recalculated and it is compared with the one found previously: if it turns out lower then *minimumVar* it will be updated. The BPM then will be upgraded to a more faithful value, as it will mean that at that time the beats appear at more regular intervals. To calculate the BPM it will be necessary to divide 60 by the average of the differences present in the queue.
+
+The indicator *transientAttack* indicates a period (10 seconds has been decided) where the waveform of the signal is too chaotic and so sudden power spikes lead to the detection of beats when they are not present. At the beginning then the indicator will be coloured green, after 10 seconds it will become white and the algorithm will be able to begin the calculations.
+
+The *Manual mode* button is used as a substitute for the beat-tracker in case the algorithm does not detect the beats properly. It will finally be the task of the user to use the *Tap Tempo* button to reach the desired BPM: it’s necessary to point out that the *Tap Tempo* button replaces the beat-tracker, so every time it is pressed, the algorithm will continue to go forward by sending MIDI messages activating the desired animations.
+
+The *BPM recalculate* button is used instead to restart the automatic calculation of BPM in the case in which between one song and the other the variance found is not lower than that one of the previous song (read again the calculation method of BPM). This would mean that the BPM would not be immediately updated with the true one.
+
+## Feature extraction phase
 
 Features' extraction is a crucial phase for what concern the rules for the choice of the lights' animations: this is made in real-time, frame by frame and independently from the beat-tracking algorithm.
 
-##  Panning
+###  Panning
 
 The panning feature checks every 1024 samples the average energy content whithin each channel (Left and Right) to determine whether the signal is more present in one side with respect to the other. The energy is normalized between 0 and 1: subtracting the results of the  L-channel from the R-channel ones we can obtain different infos, -1 if the sound is completely panned to the left or 0 to the center or 1 to the right or among these values.
 
-##  Audio Spectral Centroid
+###  Audio Spectral Centroid
 
 The audio spectral centroid (ASC) gives the center of gravity of a log-frequency power spectrum.
 
@@ -54,7 +63,7 @@ _P'(k')_ is the modified spectrum, _f'(k')_ is the center of gravity of each ele
 
 <br><p align="center"> <img width="627" height="129" src="images/ASCexample.png" > <br> <i>ASC example.</i></p>
 
-##  Velocity
+###  Velocity
 
 The velocity feature is thought for the management of the LED stripes' light intensity. As for the other features the calculus is done independently from the beat-tracking and parallel-wise, in order to optimize the real-time performance and reduce the latency. Once this feature is extracted, a midi message with this information is sent continuously to avoid a discrete variation of light intensity during the performance (stroboscopic effect).<br>
 It is calculated considering the audio energy content in the low-frequency band in order to enhance the beat effect. Finally, the log-frequency scale is used to represent the frequency band distribution that are present in the human ear system.

@@ -2,7 +2,7 @@
 
 # 1. The concept
 
-The goal of this project is to automate the control of the lighting of an architectural structure composed by LED stripes in a dynamic and smart way. 
+The goal of this project is to automate the control of the lighting of an architectural structure composed by LED stripes in a dynamic and smart way, during an electronic music show. 
 This is realized by a plug-in which analyzes the mixer-output audio signal in real-time and it communicates with a software which can handle the lights' animations thanks to the MIDI protocol.
 
 # 2. Plugin Interface

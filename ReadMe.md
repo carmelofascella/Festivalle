@@ -80,7 +80,7 @@ In this section we look at the Animation Management part which is placed at the 
 
 &nbsp; &nbsp;1 - The first command allows the user to choose among 16 different channels through which send the MIDI messages;<br>
 &nbsp; &nbsp;2 - The second command allows the user to "slow down" the sending of the MIDI messages according to the beat. Indeed, if the song      currently playing had too quick four on the floors, this would lead to many animation changes over the time.<br>
-&nbsp; &nbsp;3 - The third command allows the user to manually decide how many and what kind of animations activate.<br>
+&nbsp; &nbsp;3 - The third command allows the user to manually decide how many and what kind of animations activate from N equal 3 to 42.<br>
 
 <p align="center"> <img width="511" height="117" src="images/animation_management.png" > </p>
 

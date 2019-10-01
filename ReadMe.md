@@ -2,7 +2,8 @@
 
 # 1. The concept
 
-The goal of this project is the automated control of the dynamic lighting of an architectural structure composed by LED stripes: this is done by a plug-in which analyzes the mixer-output audio signal in real-time.
+The goal of this project is to automate the control of the lighting of an architectural structure composed by LED stripes in a dynamic and smart way. 
+This is realized by a plug-in which analyzes the mixer-output audio signal in real-time and it communicates with a software which can handle the lights' animations thanks to the MIDI protocol.
 
 # 2. Plugin Interface
 
@@ -14,7 +15,7 @@ The Plug-in is all made by using the C++ JUCE application framework.
 The Algorithm is based on few simples points:
 
 - Beat detection frame by frame from the signal and the BPM calculus from it;
-- Features extraction from the actual audio frame: audio panning, Audio Spectral Centroid (for audio "birghtness" calculation) and velocity (as an indicator of the audio intensity);
+- Features extraction from the actual audio frame: audio panning, Audio Spectral Centroid (for audio "brightness" calculation) and velocity (as an indicator of the audio intensity);
 - Once features are extracted, a MIDI message created by a set of rules related to those characteristics is sent, in order to activate 3*N possible light patterns, where N is the number of the available animations for each of the 3 sets of the brightness' value of the actual frame.
 
 ##  3.1 Beat Tracking algorithm

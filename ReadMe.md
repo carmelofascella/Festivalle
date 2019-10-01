@@ -95,6 +95,7 @@ In this section we look at the Animation Management part which is placed at the 
 
 # The rendering phase: 3D Mapper + Plugin 
 
+The animations were created with 3D Mapper based on the LED system, their disposition to form a specific architecture and the choices of the client. They will be interconnected to the 3n midi messages obtained with the tree structure and the velocity parameter, all calculated on the audio input.
 
 # Live Performance on stage
 

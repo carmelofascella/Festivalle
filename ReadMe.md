@@ -6,7 +6,7 @@ This is realized by a plug-in which analyzes the mixer-output audio signal in re
 
 The Plug-in is all made by using the C++ JUCE application framework and shows up like in the GIF below. 
 
-![gif](images/interface.gif)
+<p align="center"> <img width="default" height="default" src="images/interface.gif"> </p>
 
 # The Algorithm
 
@@ -68,7 +68,7 @@ _P'(k')_ is the modified spectrum, _f'(k')_ is the center of gravity of each ele
 The velocity feature is thought for the management of the LED stripes' light intensity. As for the other features the calculus is done independently from the beat-tracking and parallel-wise, in order to optimize the real-time performance and reduce the latency. Once this feature is extracted, a midi message with this information is sent continuously to avoid a discrete variation of light intensity during the performance (stroboscopic effect).<br>
 It is calculated considering the audio energy content in the low-frequency band in order to enhance the beat effect. Finally, the log-frequency scale is used to represent the frequency band distribution that are present in the human ear system.
 
-![gif](images/velocity(2).gif) <br>
+<p align="center"> <img width="default" height="default" src="images/velocity(2).gif"> </p>
 
 # Lights' animation 
 
@@ -95,7 +95,10 @@ In this section we look at the Animation Management part which is placed at the 
 
 # The rendering phase: 3D Mapper + Plugin 
 
-The animations were created with 3D Mapper based on the LED system, their disposition to form a specific architecture and the choices of the client. They will be interconnected to the 3n midi messages obtained with the tree structure and the velocity parameter, all calculated on the audio input.
+<p align="center"> <img width="default" height="default" src="images/1.gif"> </p>
+<p align="center"> <img width="default" height="default" src="images/2.gif"> </p>
+
+The animations were created with 3D Mapper based on the LED system, their disposition to form a specific architecture and choices of the client. They will be interconnected to the 3n midi messages obtained with the tree structure and the velocity parameter, calculated on the audio input.
 
 # Live Performance on stage
 

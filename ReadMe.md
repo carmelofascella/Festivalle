@@ -15,7 +15,7 @@ The Algorithm is based on few simples points:
 
 - Beat detection frame by frame from the signal and the BPM calculus from it;
 - Features extraction from the actual audio frame: audio panning, Audio Spectral Centroid (for audio "birghtness" calculation) and velocity (as an indicator of the audio intensity);
-- Once features are extracted, a MIDI message created by a set of rules related to those characteristics is sent, in order to activate 3N possible light patterns.
+- Once features are extracted, a MIDI message created by a set of rules related to those characteristics is sent, in order to activate 3*N possible light patterns, where N is the number of the available animations for each of the 3 sets of the brightness' value of the actual frame.
 
 ##  3.1 Beat Tracking algorithm
 

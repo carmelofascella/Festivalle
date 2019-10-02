@@ -101,7 +101,13 @@ In this section we look at the Animation Management part which is placed at the 
 The animations were created with 3D Mapper based on the LED system, their disposition to form a specific architecture and choices of the client. They will be interconnected to the 3n midi messages obtained with the tree structure and the velocity parameter, calculated on the audio input.
 
 # Live Performance on stage
-[![](https://github.com/Karwelox/Festivalle/blob/master/images/Capture.JPG)](http://www.youtube.com/watch?v=G-IADKZBHfQ "") 
+
+<a href="http://www.youtube.com/watch?v=G-IADKZBHfQ">
+<p align="center">
+  <img src="https://github.com/Karwelox/Festivalle/blob/master/images/Capture.JPG">
+</p>
+</a>
+
  
 ## References 
 
